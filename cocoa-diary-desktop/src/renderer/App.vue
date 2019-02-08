@@ -1,25 +1,23 @@
 <template>
   <div id="app">
-    <md-app>
-      <md-app-toolbar class="md-primary">
-        <span class="md-title">Settings</span>
-      </md-app-toolbar>
-      <md-app-content>
-        <settings></settings>
-      </md-app-content>
-    </md-app>
-    
+      <editor v-show=!($store.state.showSettings)></editor>
+      <settings v-show=$store.state.showSettings></settings>
   </div>
 </template>
 
 <script>
+  import Editor from '@/components/Editor'
   import Settings from '@/components/Settings'
 
   export default {
     name: 'cocoa-diary-desktop',
     components: {
+      Editor,
       Settings
-    }
+    },
+    data : () => ({
+      title: 'Settings'
+    })
   }
 </script>
 
