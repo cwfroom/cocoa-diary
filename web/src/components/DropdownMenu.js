@@ -45,10 +45,8 @@ class DropdownMenu extends Component {
         )
     }
 
-    handleItemClick = (event) => {
-        event.preventDefault()
-        console.log(event)
-        //this.props.setFunc(event.key)
+    handleItemClick = (value) => {
+        this.props.setFunc(value.item)
     }
 
     render () {
@@ -79,7 +77,9 @@ class DropdownMenu extends Component {
               open={Boolean(this.state.anchorEl)}
               onClose={this.handleMenuClose}
             >
-                {items}
+                {items.map( (item, i) => 
+                  <MenuItem key={i} onClick={this.handleItemClick.bind(this, {item})}>{item}</MenuItem>
+                )}
             </StyledMenu>
           </div>
         )

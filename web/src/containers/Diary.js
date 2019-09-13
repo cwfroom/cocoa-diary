@@ -12,8 +12,9 @@ class Diary extends Component {
         this.state = {
             firstYear: d.getFullYear(),
             currentYear: d.getFullYear(),
-            currentMonth: d.getMonth() + 1,
-            currentdate: d.getDate()
+            selectedYear: d.getFullYear(),
+            selectedMonth: d.getMonth() + 1,
+            selectedDate: d.getDate()
         }
     }
 
@@ -29,18 +30,16 @@ class Diary extends Component {
         })
     }
 
-    setCurrentYear = (value) => {
+    setSelectedYear = (value) => {
         this.setState({
-            currentYear: value
+            selectedYear: value
         })
     }
 
-    setCurrentMonth = (value) => {
-        this.setState(
-            {
-                currentMonth: value
-            }
-        )
+    setSelectedMonth = (value) => {
+        this.setState({
+                selectedMonth: value
+        })
     }
 
     render () {
@@ -49,14 +48,14 @@ class Diary extends Component {
                 <DropdownMenu
                     startValue={this.state.currentYear}
                     endValue={this.state.firstYear}
-                    selectedValue={this.state.currentYear}
-                    setFunc = {this.setCurrentYear}
+                    selectedValue={this.state.selectedYear}
+                    setFunc = {this.setSelectedYear}
                 ></DropdownMenu>
                 <DropdownMenu
                     startValue= {1}
                     endValue= {12}
-                    selectedValue= {this.state.currentMonth}
-                    setFunc = {this.setCurrentMonth}
+                    selectedValue= {this.state.selectedMonth}
+                    setFunc = {this.setSelectedMonth}
                 ></DropdownMenu>
 
                 <List>
