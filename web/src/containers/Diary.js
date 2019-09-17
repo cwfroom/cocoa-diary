@@ -6,14 +6,14 @@ import ListItem from '@material-ui/core/ListItem'
 import { Box } from '@material-ui/core'
 
 const styles = {
-    inlineButton: {
-        
+    inlineContainer: {
+        display: 'inline-block'
     },
     diaryRoot: {
       
     },
     leftPanel: {
-        maxWidth: '200px'
+        maxWidth: '250px'
     }
 }
 
@@ -103,21 +103,22 @@ class Diary extends Component {
         return (
             <div className={classes.diaryRoot}>
                 <Box className={classes.leftPanel}>
-                <DropdownMenu
-                    className = {classes.inlineButton}
-                    startValue={this.state.currentYear}
-                    endValue={this.state.firstYear}
-                    selectedValue={this.state.selectedYear}
-                    setFunc = {this.setSelectedYear}
-                ></DropdownMenu>
-                <DropdownMenu
-                    className = {classes.inlineButton}
-                    startValue= {1}
-                    endValue= {12}
-                    selectedValue= {this.state.selectedMonth}
-                    setFunc = {this.setSelectedMonth}
-                ></DropdownMenu>
-
+                    <Box className = {classes.inlineContainer}>
+                        <DropdownMenu 
+                            startValue={this.state.currentYear}
+                            endValue={this.state.firstYear}
+                            selectedValue={this.state.selectedYear}
+                            setFunc = {this.setSelectedYear}
+                        ></DropdownMenu>
+                    </Box>
+                    <Box className = {classes.inlineContainer}>
+                        <DropdownMenu
+                            startValue= {1}
+                            endValue= {12}
+                            selectedValue= {this.state.selectedMonth}
+                            setFunc = {this.setSelectedMonth}
+                        ></DropdownMenu>
+                    </Box>
                 <List>
                     {this.state.entryList.map( (entry, i) => 
                         <ListItem
