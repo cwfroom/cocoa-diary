@@ -2,31 +2,43 @@ import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import { Box, TextField, List, ListItem } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
+import { height } from '@material-ui/system';
 
 
 const styles = {
-    inlineContainer: {
-        display: 'inline-block',
-        marginLeft: '30px'
+    diaryRoot: {
+        maxHeight: '100vh'
     },
     leftPanel: {
         maxWidth: '250px',
-        float: 'left'
+        float: 'left',
+        marginRight: '10px',
+        padding: '0'
     },
     rightPanel: {
-        maxWidth: '100%-250px'
+        marginLeft: '260px',
+        maxWidth: 'calc(100% - 260px)'
+    },
+    inlineBox: {
+        display: 'inline-block',
+        marginLeft: '30px'
     },
     entryList: {
-        maxHeight: 'vmax'
+        marginTop: '5px',
+        height: '80vh',
+        overflow: 'auto'
     },
     narrowTextField: {
         float: 'left',
         maxWidth: '45px'
     },
     titleTextField: {
-        width: '100%-135px'
-    }
-}
+        width: 'calc(100% - 135px)'
+    },
+    contentTextField: {
+        width: '100%',
+        minHeight: '100%'
+    }}
 
 class Diary extends Component {
 
@@ -35,6 +47,7 @@ class Diary extends Component {
         const d = new Date()
         
         this.state = {
+            windowHeight: 0,
             firstYear: d.getFullYear(),
             currentYear: d.getFullYear(),
             selectedYear: d.getFullYear(),
@@ -49,6 +62,8 @@ class Diary extends Component {
     }
 
     componentDidMount = () => {
+        this.updateWindowHeight()
+        window.addEventListener('resize', this.updateWindowHeight)
         fetch(this.props.apiURL + '/diary/firstyear', {
             method: 'POST',
         })
@@ -62,10 +77,19 @@ class Diary extends Component {
         this.fetchMonth()
     }
 
+    updateWindowHeight = () => {
+        this.setState(
+            {windowHeight: window.innerHeight}
+        )
+    }
+
     componentDidUpdate = (prevProps, prevState) => {
         // Fetch month
         if (prevState.selectedYear !== this.state.selectedYear || prevState.selectedMonth !== this.state.selectedMonth) {
             this.fetchMonth()
+            this.setState({
+                selectedIndex: 0
+            })
         }
         // Fetch entry
         if (prevState.selectedIndex !== this.state.selectedIndex) {
@@ -140,7 +164,7 @@ class Diary extends Component {
         return (
             <div className={classes.diaryRoot}>
                 <Box className={classes.leftPanel}>
-                    <Box className = {classes.inlineContainer}>
+                    <Box className = {classes.inlineBox}>
                         <DropdownMenu 
                             startValue={this.state.currentYear}
                             endValue={this.state.firstYear}
@@ -148,7 +172,7 @@ class Diary extends Component {
                             setFunc = {this.setSelectedYear}
                         ></DropdownMenu>
                     </Box>
-                    <Box className = {classes.inlineContainer}>
+                    <Box className = {classes.inlineBox}>
                         <DropdownMenu
                             startValue= {1}
                             endValue= {12}
@@ -164,8 +188,8 @@ class Diary extends Component {
                             key={i}
                             onClick={this.handleEntryListClick.bind(this, i)}
                         >
-                            {'[' + this.twoDigits(this.state.selectedYear % 100) + this.twoDigits(this.state.selectedMonth) + 
-                            this.twoDigits(entry['Day']) + '] ' + entry['Title']}
+                            { (entry['Day'] !== 0) ? '[' + this.twoDigits(this.state.selectedYear % 100) + this.twoDigits(this.state.selectedMonth) + 
+                            this.twoDigits(entry['Day']) + '] ' + entry['Title'] : entry['Title']}
                         </ListItem>
                     )}
                 </List>
@@ -200,6 +224,9 @@ class Diary extends Component {
                         />
                         <br />
                         <TextField
+                            multiline
+                            rows={this.state.windowHeight / 30}
+                            className={classes.contentTextField}
                             id='content=textfield'
                             variant='outlined'
                             value={this.state.currentContent}

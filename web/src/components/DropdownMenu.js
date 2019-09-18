@@ -47,6 +47,7 @@ class DropdownMenu extends Component {
 
     handleItemClick = (value) => {
         this.props.setFunc(value.item)
+        this.handleMenuClose()
     }
 
     render () {
