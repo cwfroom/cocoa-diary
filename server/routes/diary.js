@@ -14,39 +14,24 @@ function twoDigits (value) {
     return ("0" + value).slice(-2)
 }
 
-function openMonth (res, year, month) {
+function openMonth (year, month, callback) {
     const filePath = path.join(config['DataPath'], year.toString(), twoDigits(month) + '.zzd')
     fs.readFile(filePath,  (err, content) => {
         if (err) {
-            res.send(JSON.stringify({}))
+            callback({})
         }else{
             fileCache = JSON.parse(content)
-            const entryList = fileCache['List']
-            let titleList = []
-            for (let i = 0; i < entryList.length; i++) {
-                const titleObj = {
-                    'Index': i,
-                    'Day': entryList[i]['Day'],
-                    'Title': entryList[i]['Title'],
-                }
-                titleList.push(titleObj)
-            }
-            res.send(JSON.stringify(titleList))
+            callback(fileCache)
         }
     })
 }
 
-function parseFile (raw, callback) {
-    const titleList = []
-    for (let i = 0; i < raw.length; i++) {
-        const entry = 
-        titleList[day] = entry['Title']
+function retrieveEntry(file, index, callback) {
+    if (file['List'] && file['List'][index]){
+        callback({'Content':file['List'][index]['Content']})
+    }else{
+        callback({})
     }
-    callback(titleList)
-}
-
-function retrieveEntry(res, date) {
-
 }
 
 router.post('/firstyear', (req, res) => {
@@ -55,7 +40,37 @@ router.post('/firstyear', (req, res) => {
 
 router.post('/month', (req, res) => {
     const {year, month} = req.body
-    openMonth(res, year, month)
+    openMonth(year, month, (file) => {
+        if (file === {}) {
+            res.send('Error')
+        }else{
+            const entryList = fileCache['List']
+            let titleList = []
+            for (let i = 0; i < entryList.length; i++) {
+                const titleObj = {
+                    'Day': entryList[i]['Day'],
+                    'Title': entryList[i]['Title'],
+                }
+                titleList.push(titleObj)
+            }
+            res.send(JSON.stringify(titleList))
+        }
+    })
+})
+
+router.post('/entry', (req, res) => {
+    const {year, month, index} = req.body
+    if (parseInt(year) === fileCache['Year'] && parseInt(month) === fileCache['Month']) {
+        retrieveEntry(fileCache, index, (entry) => {
+            res.send(JSON.stringify(entry))
+        })
+    }else{
+        openMonth(year, month, (file) => {
+            retrieveEntry(file, index, (entry) => {
+                res.send(JSON.stringify(entry))
+            })
+        })
+    }
 })
 
 module.exports = router
