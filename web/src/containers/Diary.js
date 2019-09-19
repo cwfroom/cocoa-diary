@@ -56,13 +56,16 @@ class Diary extends Component {
             entryList: [
                 {'Day': 0, 'Title': ''}
             ],
-            currentContent: ''
+            currentContent: '',
+            pendingChanges: {}
         }
     }
 
     componentDidMount = () => {
         this.updateWindowHeight()
         window.addEventListener('resize', this.updateWindowHeight)
+        document.addEventListener('keydown', this.hotkeyCreate, false)
+
         fetch(this.props.apiURL + '/diary/firstyear', {
             method: 'POST',
         })
@@ -94,6 +97,10 @@ class Diary extends Component {
         if (prevState.selectedIndex !== this.state.selectedIndex || this.state.currentContent === '') {
             this.fetchEntry()
         }
+    }
+
+    componentWillUnmount = () => {
+        window.removeEventListener('resize', this.updateWindowHeight)
     }
 
     diaryFetch = (route, body, callback) => {
@@ -156,6 +163,28 @@ class Diary extends Component {
         this.setState(
             {selectedIndex: value}
         )
+    }
+
+    hotkeyCreate = (event) => {
+        if (event.altKey && event.keyCode === 78) {
+            this.createEntry()
+        }
+    }
+
+    createEntry = () => {
+        this.setState( (state) => {
+            const lastDay = (state.entryList.length > 0) ? state.entryList[state.entryList.length - 1]['Day'] : 0
+            const modified = state.entryList.concat({
+                'Day': lastDay + 1,
+                'Title': ''
+            })
+
+            return {
+                ...state,
+                entryList: modified,
+                selectedIndex: modified.length - 1
+            }
+        })
     }
 
     render () {
@@ -226,7 +255,7 @@ class Diary extends Component {
                             multiline
                             rows={this.state.windowHeight / 30}
                             className={classes.contentTextField}
-                            id='content=textfield'
+                            id='content-textfield'
                             variant='outlined'
                             value={this.state.currentContent}
                         />
