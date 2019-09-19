@@ -36,7 +36,9 @@ const styles = {
     },
     contentTextField: {
         width: '100%',
-        minHeight: '100%'
+        minHeight: '100%',
+        fontFamily: '"Microsoft YaHei UI", "Roboto"',
+        fontSize: '36px'
     },
     wordCountLabel: {
         float: 'right'
