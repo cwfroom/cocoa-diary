@@ -37,7 +37,11 @@ const styles = {
     contentTextField: {
         width: '100%',
         minHeight: '100%'
-    }}
+    },
+    wordCountLabel: {
+        float: 'right'
+    }
+}
 
 class Diary extends Component {
 
@@ -328,6 +332,10 @@ class Diary extends Component {
                             value={this.state.currentContent}
                             onChange={this.handleTextFieldUpdate('Content')}
                         />
+                        <br />
+                        <Box className={classes.wordCountLabel}>
+                            Word Count: {this.state.currentContent.length}
+                        </Box>
                 </Box>
 
                 <Snackbar
