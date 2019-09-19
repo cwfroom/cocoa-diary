@@ -14,11 +14,15 @@ function twoDigits (value) {
     return ("0" + value).slice(-2)
 }
 
+function getFilePath (year, month) {
+    return path.join(config['DataPath'], year.toString(), twoDigits(month) + '.zzd')
+}
+
 function openMonth (year, month, callback) {
-    const filePath = path.join(config['DataPath'], year.toString(), twoDigits(month) + '.zzd')
+    const filePath = getFilePath(year, month)
     fs.readFile(filePath,  (err, content) => {
         if (err) {
-            callback({})
+            callback('')
         }else{
             fileCache = JSON.parse(content)
             callback(fileCache)
@@ -34,6 +38,38 @@ function retrieveEntry(file, index, callback) {
     }
 }
 
+function matchCache(year, month) {
+    return (parseInt(year) === fileCache['Year'] && parseInt(month) === fileCache['Month'])
+}
+
+function updateList(file, changes, callback) {
+    let list = file['List']
+    const indices = Object.keys(changes)
+    const keys = ['Day', 'Title', 'Content']
+    indices.forEach(index => {
+        if (!(index in list)) {
+            list[index] = {}
+        }
+        keys.forEach(key => {
+            if (changes[index][key]) {
+                list[index][key] = changes[index][key]
+                // To keep files compatible with zzDiary editor
+                if (key === 'Content') {
+                    list[index]['Content'] = list[index]['Content'].replace(/\r?\n/g, "\r\n")
+                }
+            }
+        })
+    })
+    file['List'] = list
+    const filePath = getFilePath(file['Year'], file['Month'])
+    fs.writeFile(filePath, JSON.stringify(file), (err) => {
+        if (err) {
+            callback({'Result': 'Error'})
+        }
+        callback({'Result': 'Saved'})
+    })
+}
+
 router.post('/firstyear', (req, res) => {
     res.send({'FirstYear': config['FirstYear']})
 })
@@ -41,8 +77,8 @@ router.post('/firstyear', (req, res) => {
 router.post('/month', (req, res) => {
     const {year, month} = req.body
     openMonth(year, month, (file) => {
-        if (file === {}) {
-            res.send('Error')
+        if (file === '') {
+            res.send(JSON.stringify({'Day': 0, 'Title': ''}))
         }else{
             const entryList = fileCache['List']
             let titleList = []
@@ -60,7 +96,7 @@ router.post('/month', (req, res) => {
 
 router.post('/entry', (req, res) => {
     const {year, month, index} = req.body
-    if (parseInt(year) === fileCache['Year'] && parseInt(month) === fileCache['Month']) {
+    if (matchCache(year, month)) {
         retrieveEntry(fileCache, index, (entry) => {
             res.send(JSON.stringify(entry))
         })
@@ -72,5 +108,21 @@ router.post('/entry', (req, res) => {
         })
     }
 })
+
+router.post('/submit', (req, res) => {
+    const {year, month, changes} = req.body
+    if (matchCache(year, month)) {
+        updateList(fileCache, changes, (result) => {
+            res.send(JSON.stringify(result))
+        })
+    }else{
+        openMonth(year, month, (file) => {
+            updateList(file, changes, (result) => {
+                res.send(JSON.stringify(result))
+            })
+        })
+    }
+})
+
 
 module.exports = router

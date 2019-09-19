@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import { Box, TextField, List, ListItem } from '@material-ui/core'
+import { Box, TextField, List, ListItem, Snackbar } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
 
 
@@ -57,7 +57,9 @@ class Diary extends Component {
                 {'Day': 0, 'Title': ''}
             ],
             currentContent: '',
-            pendingChanges: {}
+            pendingChanges: {},
+            showSnackBar: false,
+            snackBarMessage: ''
         }
     }
 
@@ -65,6 +67,7 @@ class Diary extends Component {
         this.updateWindowHeight()
         window.addEventListener('resize', this.updateWindowHeight)
         document.addEventListener('keydown', this.hotkeyCreate, false)
+        document.addEventListener('keydown', this.hotkeySubmit, false)
 
         fetch(this.props.apiURL + '/diary/firstyear', {
             method: 'POST',
@@ -183,12 +186,18 @@ class Diary extends Component {
             }
             )
         }
-        
+        this.updateChanges(name, event.target.value)
     }
 
     hotkeyCreate = (event) => {
         if (event.altKey && event.keyCode === 78) {
             this.createEntry()
+        }
+    }
+
+    hotkeySubmit = (event) => {
+        if (event.altKey && event.keyCode === 83) {
+            this.submitChanges()
         }
     }
 
@@ -205,7 +214,43 @@ class Diary extends Component {
                 entryList: modified,
                 selectedIndex: modified.length - 1
             }
+        }, () => {
+            this.updateChanges('Day', this.state.entryList[this.state.entryList.length - 1]['Day'])
         })
+    }
+
+    updateChanges = (key, value) => {
+        this.setState( (state) => {
+            let pendingChangesCopy = state.pendingChanges
+            if (!(state.selectedIndex in pendingChangesCopy)) {
+                pendingChangesCopy[state.selectedIndex] = {}
+            }
+            pendingChangesCopy[state.selectedIndex][key] = value
+            return {
+                ...state,
+                pendingChanges: pendingChangesCopy
+            }
+        })
+    }
+
+    submitChanges = () => {
+        if (Object.entries(this.state.pendingChanges).length !== 0){
+            const body = {
+                'year': this.state.selectedYear,
+                'month': this.state.selectedMonth,
+                'changes': this.state.pendingChanges
+            }
+            this.diaryFetch('submit', body, (result) => {
+                this.setState({
+                    snackBarMessage: result['Result'],
+                    showSnackBar: true
+                })
+            })
+            this.setState(
+                {pendingChanges: {}}
+            )
+        }
+        
     }
 
     render () {
@@ -284,6 +329,17 @@ class Diary extends Component {
                             onChange={this.handleTextFieldUpdate('Content')}
                         />
                 </Box>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center'
+                    }}
+                    open={this.state.showSnackBar}
+                    autoHideDuration={3000}
+                    message={this.state.snackBarMessage}
+                    onClose={() => this.setState({showSnackBar:false})}
+                />
             </div>
         )
     }
