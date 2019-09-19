@@ -30,7 +30,7 @@ function retrieveEntry(file, index, callback) {
     if (file['List'] && file['List'][index]){
         callback({'Content':file['List'][index]['Content']})
     }else{
-        callback({})
+        callback({'Content':''})
     }
 }
 

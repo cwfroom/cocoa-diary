@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import { Box, TextField, List, ListItem } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
-import { height } from '@material-ui/system';
 
 
 const styles = {
@@ -92,7 +91,7 @@ class Diary extends Component {
             })
         }
         // Fetch entry
-        if (prevState.selectedIndex !== this.state.selectedIndex) {
+        if (prevState.selectedIndex !== this.state.selectedIndex || this.state.currentContent === '') {
             this.fetchEntry()
         }
     }
