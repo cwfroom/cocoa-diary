@@ -165,6 +165,27 @@ class Diary extends Component {
         )
     }
 
+    handleTextFieldUpdate = (name) => (event) => {
+        if (name === 'Content') {
+            this.setState({
+                currentContent: event.target.value
+            })
+        } else {
+            const value = event.target.value
+            this.setState( (state) => {
+                let entryListCopy = [...state.entryList]
+                entryListCopy[state.selectedIndex][name] = value
+                
+                return {
+                    ...state,
+                    entryList: entryListCopy
+                }
+            }
+            )
+        }
+        
+    }
+
     hotkeyCreate = (event) => {
         if (event.altKey && event.keyCode === 78) {
             this.createEntry()
@@ -243,12 +264,14 @@ class Diary extends Component {
                             id='day-textfield'
                             variant='outlined'
                             value={this.state.entryList[this.state.selectedIndex] ? this.twoDigits(this.state.entryList[this.state.selectedIndex]['Day']): '00'}
+                            onChange={this.handleTextFieldUpdate('Day')}
                         />
                         <TextField
                             className={classes.titleTextField}
                             id='title-textfield'
                             variant='outlined'
                             value={this.state.entryList[this.state.selectedIndex] ? this.state.entryList[this.state.selectedIndex]['Title'] : ''}
+                            onChange={this.handleTextFieldUpdate('Title')}
                         />
                         <br />
                         <TextField
@@ -258,6 +281,7 @@ class Diary extends Component {
                             id='content-textfield'
                             variant='outlined'
                             value={this.state.currentContent}
+                            onChange={this.handleTextFieldUpdate('Content')}
                         />
                 </Box>
             </div>
