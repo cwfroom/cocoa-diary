@@ -22,6 +22,14 @@ function openMonth (year, month, callback) {
     const filePath = getFilePath(year, month)
     fs.readFile(filePath,  (err, content) => {
         if (err) {
+            const newMonth = {
+                Year: year,
+                Month: month,
+                List: []
+            }
+            fs.writeFile(getFilePath(year, month), JSON.stringify(newMonth), (err) => {
+                console.log('Failed to create new month file')
+            })
             callback('')
         }else{
             fileCache = JSON.parse(content)

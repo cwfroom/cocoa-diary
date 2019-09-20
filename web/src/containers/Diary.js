@@ -331,12 +331,12 @@ class Diary extends Component {
                             className={classes.contentTextField}
                             id='content-textfield'
                             variant='outlined'
-                            value={this.state.currentContent}
+                            value={this.state.currentContent ? this.state.currentContent : ''}
                             onChange={this.handleTextFieldUpdate('Content')}
                         />
                         <br />
                         <Box className={classes.wordCountLabel}>
-                            Word Count: {this.state.currentContent.length}
+                            Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
                         </Box>
                 </Box>
 
