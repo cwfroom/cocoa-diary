@@ -9,6 +9,7 @@ const basicAuth = require('express-basic-auth')
 
 // Custom modules
 const diary = require('./routes/diary')
+const logbook = require('./routes/logbook')
 
 // Read config file, caching is fine
 const config = require('./config.json')
@@ -33,3 +34,4 @@ app.listen(port, () => {
 
 // Routing
 app.use('/diary', diary)
+app.use('/logbook', logbook)

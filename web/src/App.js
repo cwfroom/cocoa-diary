@@ -7,6 +7,7 @@ import Tab from '@material-ui/core/Tab'
 import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
 import Diary from './containers/Diary'
+import Logbook from './containers/Logbook'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -61,7 +62,7 @@ class App extends Component {
           <Diary apiURL={apiURL}/>
         </TabPanel>
         <TabPanel value={this.state.currentTab} index={1}>
-          Logbook
+          <Logbook apiURL={apiURL}/>
         </TabPanel>
       </div>
     )
