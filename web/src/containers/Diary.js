@@ -73,11 +73,7 @@ class Diary extends Component {
         document.addEventListener('keydown', this.hotkeyCreate, false)
         document.addEventListener('keydown', this.hotkeySubmit, false)
 
-        fetch(this.props.apiURL + '/diary/firstyear', {
-            method: 'POST',
-        })
-        .then( res => res.json())
-        .then( (result) => {
+        this.diaryFetch('firstyear', {}, (result) => {
             this.setState({
                 firstYear: parseInt(result['FirstYear'])
             })
