@@ -59,9 +59,7 @@ class Diary extends Component {
             selectedMonth: d.getMonth() + 1,
             selectedIndex: 0,
             selectedDay: 0,
-            entryList: [
-                {'Day': 0, 'Title': ''}
-            ],
+            entryList: [],
             currentContent: '',
             pendingChanges: {},
             showSnackBar: false,
@@ -337,6 +335,8 @@ class Diary extends Component {
                         <br />
                         <Box className={classes.wordCountLabel}>
                             Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
+                            <br />
+                            Queued: {Object.entries(this.state.pendingChanges).length}
                         </Box>
                 </Box>
 
