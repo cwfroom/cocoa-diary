@@ -70,8 +70,7 @@ class Diary extends Component {
     componentDidMount = () => {
         this.updateWindowHeight()
         window.addEventListener('resize', this.updateWindowHeight)
-        document.addEventListener('keydown', this.hotkeyCreate, false)
-        document.addEventListener('keydown', this.hotkeySubmit, false)
+        document.addEventListener('keydown', this.hotKeys, false)
 
         this.diaryFetch('firstyear', {}, (result) => {
             this.setState({
@@ -194,15 +193,13 @@ class Diary extends Component {
         this.updateChanges(name, event.target.value)
     }
 
-    hotkeyCreate = (event) => {
-        if (event.altKey && event.keyCode === 78) {
-            this.createEntry()
-        }
-    }
-
-    hotkeySubmit = (event) => {
-        if (event.altKey && event.keyCode === 83) {
-            this.submitChanges()
+    hotKeys = (event) => {
+        if (event.ctrlKey && event.altKey) {
+            if (event.key === 'n') {
+                this.createEntry()
+            }else if (event.key === 's') {
+                this.submitChanges()
+            }
         }
     }
 
