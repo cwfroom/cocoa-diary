@@ -79,7 +79,7 @@ class Diary extends Component {
             })
         })
 
-        this.fetchMonth()
+        this.fetchMonth(true)
     }
 
     updateWindowHeight = () => {
@@ -97,7 +97,7 @@ class Diary extends Component {
             })
         }
         // Fetch entry
-        if (prevState.selectedIndex !== this.state.selectedIndex || this.state.currentContent === '') {
+        if (prevState.selectedIndex !== this.state.selectedIndex) {
             this.fetchEntry()
         }
     }
@@ -121,7 +121,7 @@ class Diary extends Component {
         })
     }
 
-    fetchMonth = () => {
+    fetchMonth = (initialize) => {
         const body = {
             'year': this.state.selectedYear,
             'month': this.state.selectedMonth
@@ -130,6 +130,11 @@ class Diary extends Component {
             this.setState(
                 {entryList: result}
             )
+            if (initialize && result.length > 0) {
+                this.setState({
+                    selectedIndex: result.length-1
+                })
+            }
         })
     }
 
