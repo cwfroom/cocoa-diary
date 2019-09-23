@@ -93,7 +93,7 @@ router.post('/month', (req, res) => {
             for (let i = 0; i < entryList.length; i++) {
                 const titleObj = {
                     'Day': entryList[i]['Day'],
-                    'Title': entryList[i]['Title'],
+                    'Title': entryList[i]['Title'] ? entryList[i]['Title'] : '',
                 }
                 titleList.push(titleObj)
             }
