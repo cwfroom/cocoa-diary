@@ -97,7 +97,13 @@ class Diary extends Component {
         }
         // Fetch entry
         if (prevState.selectedIndex !== this.state.selectedIndex) {
-            this.fetchEntry()
+            if (this.state.pendingChanges[this.state.selectedIndex] && this.state.pendingChanges[this.state.selectedIndex]['Content']) {
+                this.setState({
+                    currentContent: this.state.pendingChanges[this.state.selectedIndex]['Content']
+                })
+            }else{
+                this.fetchEntry()
+            }
         }
     }
 
