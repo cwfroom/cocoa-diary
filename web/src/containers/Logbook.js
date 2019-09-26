@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import { Box, List, ListItem } from '@material-ui/core';
+import { Box, List, ListItem, Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
 
 const styles = {
     leftPanel: {
@@ -47,7 +47,10 @@ class Logbook extends Component {
                 category: this.state.categories[this.state.selectedIndex]
             }
             this.logbookFetch('category', body, (result) => {
-                console.log(result)
+                this.setState({
+                    columns: result['Columns'],
+                    list: result['List']
+                })
             })
         }
     }
@@ -93,7 +96,23 @@ class Logbook extends Component {
                 </Box>
 
                 <Box className={classes.rightPanel}>
-
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                {this.state.columns.map( (column, i) => 
+                                    <TableCell>{column}</TableCell>
+                                )
+                                }
+                                </TableRow>
+                            </TableHead>
+                            {this.state.list.map( (entry, i) => 
+                                <TableRow>
+                                    {this.state.columns.map( (column) => 
+                                        <TableCell>{entry[column]}</TableCell>
+                                    )}
+                                </TableRow>
+                            )}
+                        </Table>
                 </Box>
 
             </div>
