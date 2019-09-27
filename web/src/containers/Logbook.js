@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
-import { withStyles } from '@material-ui/core/styles';
-import { Box, List, ListItem, Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles'
+import { Box, List, ListItem} from '@material-ui/core'
+import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
+import EditDialog from '../components/EditDialog'
 
 const styles = {
     leftPanel: {
@@ -29,7 +31,10 @@ class Logbook extends Component {
             categories: [],
             selectedIndex: 0,
             columns: [],
-            list: []
+            list: [],
+            openDialog: false,
+            selectedRow: 0,
+            pendingChanges: []
         }
     }
 
@@ -76,6 +81,44 @@ class Logbook extends Component {
         )
     }
 
+    handleTableCellClick = (value) => {
+        this.setState({
+            selectedRow: value,
+            openDialog: true
+        })
+    }
+
+    handleRowUpdate = (key, value) => {
+        this.setState( (state) => {
+            let listCopy = [...state.list]
+            listCopy[state.selectedRow][key] = value ? value : ''
+            return {
+                ...state,
+                listCopy
+            }
+        })
+    }
+
+    closeDialog = () => {
+        this.setState({
+            openDialog: false
+        })
+    }
+
+    updateRow = (values) => {
+        this.setState( state => {
+            let listCopy = [...state.list]
+            const keys = Object.entries(values)
+            keys.forEach(key => {
+                listCopy[state.selectedRow][key] = values[key]
+            })
+            return {
+                ...state,
+                listCopy
+            }
+        })
+    }
+
     render () {
         const {classes} = this.props
         return (
@@ -100,20 +143,34 @@ class Logbook extends Component {
                             <TableHead>
                                 <TableRow>
                                 {this.state.columns.map( (column, i) => 
-                                    <TableCell>{column}</TableCell>
+                                    <TableCell key={'title-'+column}>{column}</TableCell>
                                 )
                                 }
                                 </TableRow>
                             </TableHead>
+                            <TableBody>
                             {this.state.list.map( (entry, i) => 
-                                <TableRow>
+                                <TableRow key={'row-'+i}>
                                     {this.state.columns.map( (column) => 
-                                        <TableCell>{entry[column]}</TableCell>
+                                        <TableCell
+                                            key={i+column}
+                                            onClick={this.handleTableCellClick.bind(this, i)}>
+                                        {entry[column]}
+                                        </TableCell>
                                     )}
                                 </TableRow>
                             )}
+                            </TableBody>
                         </Table>
                 </Box>
+
+                <EditDialog
+                    openDialog={this.state.openDialog}
+                    closeDialog={this.closeDialog}
+                    columns={this.state.columns}
+                    row={this.state.list[this.state.selectedRow]}
+                    handleRowUpdate={this.handleRowUpdate}
+                />
 
             </div>
         )
