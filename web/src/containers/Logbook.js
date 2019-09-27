@@ -91,31 +91,27 @@ class Logbook extends Component {
     handleRowUpdate = (key, value) => {
         this.setState( (state) => {
             let listCopy = [...state.list]
-            listCopy[state.selectedRow][key] = value ? value : ''
+            let pendingChangesCopy = [...state.pendingChanges]
+            if (!pendingChangesCopy[state.selectedRow]) {
+                pendingChangesCopy[state.selectedRow] = {}
+            }
+            listCopy[state.selectedRow][key] = value
+            pendingChangesCopy[state.selectedRow][key] = value
             return {
                 ...state,
-                listCopy
+                listCopy,
+                pendingChangesCopy
             }
         })
+    }
+
+    handleSubmit = () => {
+        
     }
 
     closeDialog = () => {
         this.setState({
             openDialog: false
-        })
-    }
-
-    updateRow = (values) => {
-        this.setState( state => {
-            let listCopy = [...state.list]
-            const keys = Object.entries(values)
-            keys.forEach(key => {
-                listCopy[state.selectedRow][key] = values[key]
-            })
-            return {
-                ...state,
-                listCopy
-            }
         })
     }
 

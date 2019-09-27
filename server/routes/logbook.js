@@ -48,4 +48,13 @@ router.post('/category', (req, res) => {
     }
 })
 
+router.post('/submit', (req, res) => {
+    const {category, changes} = req.body
+    if (fileCache['Category'] === category){
+
+    }else{
+
+    }
+})
+
 module.exports = router
