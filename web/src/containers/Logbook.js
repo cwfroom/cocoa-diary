@@ -61,7 +61,7 @@ class Logbook extends Component {
             this.logbookFetch('category', body, (result) => {
                 this.setState({
                     columns: result['Columns'],
-                    list: result['List']
+                    list: result['List'].reverse()
                 })
             })
         }
@@ -103,11 +103,12 @@ class Logbook extends Component {
         this.setState( (state) => {
             let listCopy = [...state.list]
             let pendingChangesCopy = state.pendingChanges
-            if (!pendingChangesCopy[state.selectedRow]) {
-                pendingChangesCopy[state.selectedRow] = {}
+            const realIndex = listCopy.length - state.selectedRow - 1
+            if (!pendingChangesCopy[realIndex]) {
+                pendingChangesCopy[realIndex] = {}
             }
             listCopy[state.selectedRow][key] = value
-            pendingChangesCopy[state.selectedRow][key] = value
+            pendingChangesCopy[realIndex][key] = value
             return {
                 ...state,
                 list: listCopy,
@@ -136,11 +137,11 @@ class Logbook extends Component {
 
     createEntry = () => {
         this.setState( (state) => {
-            const modified = state.list.concat({})
+            const modified = [{}, ...state.list]
             return {
                 ...state,
                 list: modified,
-                selectedRow: modified.length - 1,
+                selectedRow: 0,
                 openDialog: true
             }
         })
