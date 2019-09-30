@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Box, List, ListItem} from '@material-ui/core'
+import { Box, List, ListItem, Snackbar } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import EditDialog from '../components/EditDialog'
 
@@ -13,12 +13,17 @@ const styles = {
     },
     rightPanel: {
         marginLeft: '260px',
-        maxWidth: 'calc(100% - 260px)'
+        maxWidth: 'calc(100% - 260px)',
+        paddingRight: '10px',
+        overflow: 'auto'
     },
     categoryList: {
         marginTop: '5px',
         height: '80vh',
         overflow: 'auto'
+    },
+    statusLabel: {
+        float: 'right'
     }
 }
 
@@ -33,12 +38,14 @@ class Logbook extends Component {
             columns: [],
             list: [],
             openDialog: false,
+            showSnackBar: false,
             selectedRow: 0,
             pendingChanges: []
         }
     }
 
     componentDidMount = () => {
+        document.addEventListener('keydown', this.hotKeys, false)
         this.logbookFetch('index', {}, (result) => {
             this.setState({
                 categories: result
@@ -58,6 +65,10 @@ class Logbook extends Component {
                 })
             })
         }
+    }
+
+    componentWillUnmount = () => {
+        document.removeEventListener('keydown', this.hotKeys)
     }
 
     logbookFetch = (route, body, callback) => {
@@ -99,14 +110,50 @@ class Logbook extends Component {
             pendingChangesCopy[state.selectedRow][key] = value
             return {
                 ...state,
-                listCopy,
-                pendingChangesCopy
+                list: listCopy,
+                pendingChanges: pendingChangesCopy
             }
         })
     }
 
-    handleSubmit = () => {
-        
+    submitChanges = () => {
+        if (Object.entries(this.state.pendingChanges).length !== 0){
+            const body = {
+                'category': this.state.categories[this.state.selectedIndex],
+                'changes': this.state.pendingChanges
+            }
+            this.logbookFetch('submit', body, (result) => {
+                this.setState({
+                    snackBarMessage: result['Result'],
+                    showSnackBar: true
+                })
+            })
+            this.setState(
+                {pendingChanges: {}}
+            )
+        }
+    }
+
+    createEntry = () => {
+        this.setState( (state) => {
+            const modified = state.list.concat({})
+            return {
+                ...state,
+                list: modified,
+                selectedRow: modified.length - 1,
+                openDialog: true
+            }
+        })
+    }
+
+    hotKeys = (event) => {
+        if (event.ctrlKey && event.altKey) {
+            if (event.key === 'n') {
+                this.createEntry()
+            }else if (event.key === 's') {
+                this.submitChanges()
+            }
+        }
     }
 
     closeDialog = () => {
@@ -158,6 +205,10 @@ class Logbook extends Component {
                             )}
                             </TableBody>
                         </Table>
+                        <br />
+                        <Box className={classes.statusLabel}>
+                            Queued: {Object.entries(this.state.pendingChanges).length}
+                        </Box>
                 </Box>
 
                 <EditDialog
@@ -166,6 +217,17 @@ class Logbook extends Component {
                     columns={this.state.columns}
                     row={this.state.list[this.state.selectedRow]}
                     handleRowUpdate={this.handleRowUpdate}
+                />
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center'
+                    }}
+                    open={this.state.showSnackBar}
+                    autoHideDuration={3000}
+                    message={this.state.snackBarMessage}
+                    onClose={() => this.setState({showSnackBar:false})}
                 />
 
             </div>

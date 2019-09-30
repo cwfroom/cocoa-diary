@@ -26,6 +26,30 @@ function matchCache (category) {
     return fileCache['Category'] === category
 }
 
+function updateList (file, changes, callback) {
+    let list = file['List']
+    const indices = Object.keys(changes)
+    const keys = file['Columns']
+    indices.forEach(index => {
+        if (!(index in list)){
+            list[index] = {}
+        }
+        keys.forEach( key => {
+            if (changes[index][key]) {
+                list[index][key] = changes[index][key]
+            }
+        })
+    })
+    file['List'] = list
+    const filePath = getFilePath(file['Category'])
+    fs.writeFile(filePath, JSON.stringify(file), (err) => {
+        if (err) {
+            callback({'Result': 'Error'})
+        }
+        callback({'Result': 'Saved'})
+    })
+}
+
 router.post('/index', (req, res) => {
     fs.readdir(path.join(config['DataPath'], 'logbook'), (err, files) => {
         if (err) res.send('[]')
@@ -50,10 +74,16 @@ router.post('/category', (req, res) => {
 
 router.post('/submit', (req, res) => {
     const {category, changes} = req.body
-    if (fileCache['Category'] === category){
-
+    if (matchCache(category)){
+        updateList(fileCache, changes, (result) => {
+            res.send(JSON.stringify(result))
+        })
     }else{
-
+        openCategory(category, (file) => {
+            updateList(file, changes, (result) => {
+                res.send(JSON.stringify(result))
+            })
+        })
     }
 })
 
