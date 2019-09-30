@@ -203,9 +203,9 @@ class Diary extends Component {
 
     hotKeys = (event) => {
         if (event.ctrlKey && event.altKey) {
-            if (event.key === 'n') {
+            if (event.key === 'n' || event.key === 'N') {
                 this.createEntry()
-            }else if (event.key === 's') {
+            }else if (event.key === 's' || event.key === 'S') {
                 this.submitChanges()
             }
         }

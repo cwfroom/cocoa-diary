@@ -6,14 +6,14 @@ import EditDialog from '../components/EditDialog'
 
 const styles = {
     leftPanel: {
-        maxWidth: '250px',
+        maxWidth: '90px',
         float: 'left',
         marginRight: '10px',
         padding: '0'
     },
     rightPanel: {
-        marginLeft: '260px',
-        maxWidth: 'calc(100% - 260px)',
+        marginLeft: '100px',
+        maxWidth: 'calc(100% - 100px)',
         paddingRight: '10px',
         overflow: 'auto'
     },
@@ -151,11 +151,11 @@ class Logbook extends Component {
 
     hotKeys = (event) => {
         if (event.ctrlKey && event.altKey) {
-            if (event.key === 'n') {
+            if (event.key === 'n' || event.key === 'N') {
                 this.createEntry()
-            }else if (event.key === 's') {
+            }else if (event.key === 's' || event.key === 'S') {
                 this.submitChanges()
-            }else if (event.key === 'r') {
+            }else if (event.key === 'r' || event.key === 'R') {
                 this.forceReload()
             }
         }
@@ -177,6 +177,7 @@ class Logbook extends Component {
         this.setState({
             openDialog: false
         })
+        this.submitChanges()
     }
 
     render () {
