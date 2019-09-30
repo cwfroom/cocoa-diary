@@ -33,7 +33,7 @@ class EditDialog extends Component {
                             fullWidth
                             key={'textfield-'+column}
                             label={column}
-                            value={this.props.row[column]}
+                            value={this.props.row[column] ? this.props.row[column] : ''}
                             onChange={this.handleTextFieldUpdate(column)}
                         />
                     )}
