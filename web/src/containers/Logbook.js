@@ -40,7 +40,7 @@ class Logbook extends Component {
             openDialog: false,
             showSnackBar: false,
             selectedRow: 0,
-            pendingChanges: []
+            pendingChanges: {}
         }
     }
 
@@ -102,7 +102,7 @@ class Logbook extends Component {
     handleRowUpdate = (key, value) => {
         this.setState( (state) => {
             let listCopy = [...state.list]
-            let pendingChangesCopy = [...state.pendingChanges]
+            let pendingChangesCopy = state.pendingChanges
             if (!pendingChangesCopy[state.selectedRow]) {
                 pendingChangesCopy[state.selectedRow] = {}
             }
