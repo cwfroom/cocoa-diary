@@ -16,7 +16,8 @@ const styles = {
     },
     rightPanel: {
         marginLeft: '260px',
-        maxWidth: 'calc(100% - 260px)'
+        maxWidth: 'calc(100% - 260px)',
+        paddingRight: '10px'
     },
     inlineBox: {
         display: 'inline-block',
@@ -109,6 +110,7 @@ class Diary extends Component {
 
     componentWillUnmount = () => {
         window.removeEventListener('resize', this.updateWindowHeight)
+        document.removeEventListener('keydown', this.hotKeys)
     }
 
     diaryFetch = (route, body, callback) => {
@@ -258,7 +260,7 @@ class Diary extends Component {
                 {pendingChanges: {}}
             )
         }
-        
+
     }
 
     render () {
