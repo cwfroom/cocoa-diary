@@ -128,10 +128,12 @@ class Logbook extends Component {
                     snackBarMessage: result['Result'],
                     showSnackBar: true
                 })
+                if (result['Result'] === 'Saved') {
+                    this.setState(
+                        {pendingChanges: {}}
+                    )
+                }
             })
-            this.setState(
-                {pendingChanges: {}}
-            )
         }
     }
 
@@ -153,8 +155,22 @@ class Logbook extends Component {
                 this.createEntry()
             }else if (event.key === 's') {
                 this.submitChanges()
+            }else if (event.key === 'r') {
+                this.forceReload()
             }
         }
+    }
+
+    forceReload = () => {
+        const body = {
+            category: this.state.categories[this.state.selectedIndex]
+        }
+        this.logbookFetch('reload', body, (result) => {
+            this.setState({
+                columns: result['Columns'],
+                list: result['List'].reverse()
+            })
+        })
     }
 
     closeDialog = () => {

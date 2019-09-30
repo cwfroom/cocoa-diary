@@ -87,4 +87,13 @@ router.post('/submit', (req, res) => {
     }
 })
 
+// Force reload, mainly for debug purpose
+router.post('/reload', (req, res) => {
+    const {category} = req.body
+    openCategory (category, (file) => {
+        res.send(JSON.stringify(file))
+    })
+})
+
+
 module.exports = router
