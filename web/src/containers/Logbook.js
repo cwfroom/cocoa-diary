@@ -14,6 +14,7 @@ const styles = {
     rightPanel: {
         marginLeft: '100px',
         maxWidth: 'calc(100% - 100px)',
+        maxHeight: 'calc(100vh - 100px)',
         paddingRight: '10px',
         overflow: 'auto'
     },
@@ -54,7 +55,7 @@ class Logbook extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.categories.length !== this.state.categories.length) {
+        if (prevState.categories.length !== this.state.categories.length || prevState.selectedIndex !== this.state.selectedIndex) {
             const body = {
                 category: this.state.categories[this.state.selectedIndex]
             }
@@ -224,9 +225,10 @@ class Logbook extends Component {
                             </TableBody>
                         </Table>
                         <br />
-                        <Box className={classes.statusLabel}>
-                            Queued: {Object.entries(this.state.pendingChanges).length}
-                        </Box>
+                </Box>
+
+                <Box className={classes.statusLabel}>
+                    Queued: {Object.entries(this.state.pendingChanges).length}
                 </Box>
 
                 <EditDialog
