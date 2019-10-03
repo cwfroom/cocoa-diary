@@ -141,6 +141,9 @@ class Diary extends Component {
                 this.setState({
                     selectedIndex: result.length-1
                 })
+                if (result.length === 1) {
+                    this.fetchEntry()
+                }
             }
         })
     }
