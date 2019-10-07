@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import { Box, TextField, List, ListItem, Snackbar, Button } from '@material-ui/core'
+import { Box, TextField, List, ListItem, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
-import { setInterval } from 'timers'
+import { setTimeout, clearTimeout } from 'timers'
 
 const styles = {
     diaryRoot: {
@@ -65,8 +65,7 @@ class Diary extends Component {
             entryList: [],
             currentContent: '',
             pendingChanges: {},
-            showSnackBar: false,
-            snackBarMessage: ''
+            statusMessage: ''
         }
     }
 
@@ -74,7 +73,7 @@ class Diary extends Component {
         this.updateWindowHeight()
         window.addEventListener('resize', this.updateWindowHeight)
         document.addEventListener('keydown', this.hotKeys, false)
-        setInterval(this.autoSavePoll, 20000)
+        this.autoSaveTimer = this.autoSave()
 
         this.diaryFetch('firstyear', {}, (result) => {
             this.setState({
@@ -111,12 +110,6 @@ class Diary extends Component {
     componentWillUnmount = () => {
         window.removeEventListener('resize', this.updateWindowHeight)
         document.removeEventListener('keydown', this.hotKeys)
-    }
-
-    autoSavePoll = () => {
-        if (Object.keys(this.state.pendingChanges).length > 0) {
-            this.submitChanges()
-        }
     }
 
     diaryFetch = (route, body, callback) => {
@@ -207,6 +200,8 @@ class Diary extends Component {
             }
             )
         }
+        clearTimeout(this.autoSaveTimer)
+        this.autoSaveTimer = this.autoSave()
         this.updateChanges(name, event.target.value)
     }
 
@@ -261,8 +256,7 @@ class Diary extends Component {
             }
             this.diaryFetch('submit', body, (result) => {
                 this.setState({
-                    snackBarMessage: result['Result'],
-                    showSnackBar: true
+                    statusMessage: result['Result']
                 })
             })
             this.setState(
@@ -270,6 +264,10 @@ class Diary extends Component {
             )
         }
 
+    }
+
+    autoSave = () => {
+        return setTimeout(this.submitChanges, 10000)
     }
 
     render () {
@@ -356,6 +354,8 @@ class Diary extends Component {
                         <br />
                         <Box className={classes.wordCountLabel}>
                             Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
+                            <br />
+                            {this.state.statusMessage}
                         </Box>
                         <Box className={classes.saveButton}>
                             <Button
@@ -368,17 +368,6 @@ class Diary extends Component {
                             </Button>
                         </Box>
                 </Box>
-
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center'
-                    }}
-                    open={this.state.showSnackBar}
-                    autoHideDuration={3000}
-                    message={this.state.snackBarMessage}
-                    onClose={() => this.setState({showSnackBar:false})}
-                />
             </div>
         )
     }
