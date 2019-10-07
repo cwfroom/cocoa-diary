@@ -98,13 +98,10 @@ class Diary extends Component {
         }
         // Fetch entry
         if (prevState.selectedIndex !== this.state.selectedIndex) {
-            if (this.state.pendingChanges[this.state.selectedIndex] && this.state.pendingChanges[this.state.selectedIndex]['Content']) {
-                this.setState({
-                    currentContent: this.state.pendingChanges[this.state.selectedIndex]['Content']
-                })
-            }else{
-                this.fetchEntry()
+            if (this.state.pendingChanges !== {}){
+                this.submitChanges()
             }
+            this.fetchEntry()
         }
     }
 
@@ -235,10 +232,10 @@ class Diary extends Component {
     updateChanges = (key, value) => {
         this.setState( (state) => {
             let pendingChangesCopy = state.pendingChanges
-            if (!(state.selectedIndex in pendingChangesCopy)) {
-                pendingChangesCopy[state.selectedIndex] = {}
+            if (!pendingChangesCopy['Index']) {
+                pendingChangesCopy['Index'] = this.state.selectedIndex
             }
-            pendingChangesCopy[state.selectedIndex][key] = value
+            pendingChangesCopy[key] = value
             return {
                 ...state,
                 pendingChanges: pendingChangesCopy
@@ -344,8 +341,6 @@ class Diary extends Component {
                         <br />
                         <Box className={classes.wordCountLabel}>
                             Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
-                            <br />
-                            Queued: {Object.entries(this.state.pendingChanges).length}
                         </Box>
                 </Box>
 

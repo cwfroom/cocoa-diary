@@ -51,24 +51,17 @@ function matchCache(year, month) {
 }
 
 function updateList(file, changes, callback) {
-    let list = file['List']
-    const indices = Object.keys(changes)
+    const index = changes['Index']
     const keys = ['Day', 'Title', 'Content']
-    indices.forEach(index => {
-        if (!(index in list)) {
-            list[index] = {}
-        }
-        keys.forEach(key => {
-            if (changes[index][key]) {
-                list[index][key] = changes[index][key]
-                // To keep files compatible with zzDiary editor
-                if (key === 'Content') {
-                    list[index]['Content'] = list[index]['Content'].replace(/\r?\n/g, "\r\n")
-                }
+    keys.forEach( key => {
+        if (changes[key]) {
+            file['List'][index][key] = changes[key]
+            if (key === 'Content') {
+                file['List'][index]['Content'] = file['List'][index]['Content'].replace(/\r?\n/g, "\r\n")
             }
-        })
+        }
     })
-    file['List'] = list
+    
     const filePath = getFilePath(file['Year'], file['Month'])
     fs.writeFile(filePath, JSON.stringify(file), (err) => {
         if (err) {
