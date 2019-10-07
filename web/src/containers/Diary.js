@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import { Box, TextField, List, ListItem, Snackbar } from '@material-ui/core'
+import { Box, TextField, List, ListItem, Snackbar, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
 
 
@@ -42,6 +42,9 @@ const styles = {
         fontSize: '36px'
     },
     wordCountLabel: {
+        float: 'left'
+    },
+    saveButton: {
         float: 'right'
     }
 }
@@ -346,6 +349,15 @@ class Diary extends Component {
                         <br />
                         <Box className={classes.wordCountLabel}>
                             Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
+                        </Box>
+                        <Box className={classes.saveButton}>
+                            <Button
+                                variant='contained'
+                                onClick={this.submitChanges}
+                                disabled={this.state.pendingChanges !== {}}
+                            >
+                                Save
+                            </Button>
                         </Box>
                 </Box>
 
