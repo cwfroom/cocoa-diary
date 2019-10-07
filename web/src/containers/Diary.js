@@ -353,8 +353,9 @@ class Diary extends Component {
                         <Box className={classes.saveButton}>
                             <Button
                                 variant='contained'
+                                color="primary"
                                 onClick={this.submitChanges}
-                                disabled={this.state.pendingChanges !== {}}
+                                disabled={Object.keys(this.state.pendingChanges).length === 0}
                             >
                                 Save
                             </Button>
