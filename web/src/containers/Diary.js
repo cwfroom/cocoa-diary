@@ -91,16 +91,16 @@ class Diary extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        // Fetch month
+        // On switching year, fetch new month
         if (prevState.selectedYear !== this.state.selectedYear || prevState.selectedMonth !== this.state.selectedMonth) {
             this.fetchMonth()
             this.setState({
                 selectedIndex: 0
             })
         }
-        // Fetch entry
+        // On switching entry, fetch new entry
         if (prevState.selectedIndex !== this.state.selectedIndex) {
-            if (this.state.pendingChanges !== {}){
+            if (Object.keys(this.state.pendingChanges).length > 0){
                 this.submitChanges()
             }
             this.fetchEntry()
