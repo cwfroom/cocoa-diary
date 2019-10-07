@@ -55,6 +55,7 @@ function updateList(file, changes, callback) {
     const keys = ['Day', 'Title', 'Content']
     keys.forEach( key => {
         if (changes[key]) {
+            if (!file['List'][index]) file['List'][index] = {}
             file['List'][index][key] = changes[key]
             if (key === 'Content') {
                 file['List'][index]['Content'] = file['List'][index]['Content'].replace(/\r?\n/g, "\r\n")
