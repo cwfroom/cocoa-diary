@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import { Box, TextField, List, ListItem, Snackbar, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
-
+import { setInterval } from 'timers'
 
 const styles = {
     diaryRoot: {
@@ -74,6 +74,7 @@ class Diary extends Component {
         this.updateWindowHeight()
         window.addEventListener('resize', this.updateWindowHeight)
         document.addEventListener('keydown', this.hotKeys, false)
+        setInterval(this.autoSavePoll, 20000)
 
         this.diaryFetch('firstyear', {}, (result) => {
             this.setState({
@@ -110,6 +111,12 @@ class Diary extends Component {
     componentWillUnmount = () => {
         window.removeEventListener('resize', this.updateWindowHeight)
         document.removeEventListener('keydown', this.hotKeys)
+    }
+
+    autoSavePoll = () => {
+        if (Object.keys(this.state.pendingChanges).length > 0) {
+            this.submitChanges()
+        }
     }
 
     diaryFetch = (route, body, callback) => {
