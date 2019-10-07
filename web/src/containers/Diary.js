@@ -59,7 +59,6 @@ class Diary extends Component {
             selectedYear: d.getFullYear(),
             selectedMonth: d.getMonth() + 1,
             selectedIndex: 0,
-            selectedDay: 0,
             entryList: [],
             currentContent: '',
             pendingChanges: {},
@@ -296,6 +295,12 @@ class Diary extends Component {
                             this.twoDigits(entry['Day']) + '] ' + entry['Title'] : entry['Title']}
                         </ListItem>
                     )}
+                    <ListItem
+                        button
+                        onClick={this.createEntry}
+                    >
+                        New...
+                    </ListItem>
                 </List>
                 </Box>
 
