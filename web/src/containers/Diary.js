@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Box, TextField, List, ListItem, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
 import { setTimeout, clearTimeout } from 'timers'
+import { globals } from '../services/globals'
 
 const styles = {
     diaryRoot: {
@@ -116,7 +117,7 @@ class Diary extends Component {
         const headers = {
             'Content-Type': 'application/json'
         }
-        fetch(`${this.props.apiURL}/diary/${route}` , {
+        fetch(`${globals.apiURL}/diary/${route}` , {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(body)

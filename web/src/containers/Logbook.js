@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Box, List, ListItem, Snackbar } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import EditDialog from '../components/EditDialog'
+import { globals } from '../services/globals'
 
 const styles = {
     leftPanel: {
@@ -76,7 +77,7 @@ class Logbook extends Component {
         const headers = {
             'Content-Type': 'application/json'
         }
-        fetch(`${this.props.apiURL}/logbook/${route}` , {
+        fetch(`${globals.apiURL}/logbook/${route}` , {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(body)
