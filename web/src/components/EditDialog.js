@@ -22,6 +22,12 @@ class EditDialog extends Component {
         this.props.handleRowUpdate(key, event.target.value)
     }
 
+    handlePressEnter = (event) => {
+        if (event.key === 'Enter') {
+            this.handleClose()
+        }
+    }
+
     render () {
         return (
             <div>
@@ -35,6 +41,7 @@ class EditDialog extends Component {
                             label={column}
                             value={(this.props.row && this.props.row[column]) ? this.props.row[column] : ''}
                             onChange={this.handleTextFieldUpdate(column)}
+                            onKeyDown={this.handlePressEnter}
                         />
                     )}
                 </DialogContent>
