@@ -1,32 +1,37 @@
 import React, {Component} from 'react'
-import { BrowserRouter as Router, Route} from "react-router-dom"
-import './App.css'
+import { BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 import Diary from './containers/Diary'
 import Logbook from './containers/Logbook'
-
-const apiURL = 'http://127.0.0.1:2638'
+import LoginPage from './containers/LoginPage'
+import { Auth } from './services/auth'
 
 class App extends Component {
-  constructor (props) {
-    super(props)
-  }
-
   render () {
     return (
       <Router>
-        <div className="App">
-        <AppBar position="static">
-          <Tabs value={window.location.pathname}>
-            <Tab href= '/' label="Diary" value='/'/>
-            <Tab href='logbook' label="Logbook" value='/logbook'/>
-          </Tabs>
-          </AppBar>
+        <div className='App'>
+        <Route path='/' render={() => {
+          if (!Auth.isLoggedIn()) {
+            return <Redirect to={{pathname:'/login'}}/>
+          }
+        }}
+        />
+        
+        {Auth.isLoggedIn() &&
+          <AppBar position='static'>
+            <Tabs value={window.location.pathname}>
+              <Tab href='diary' label='Diary' value='/diary'/>
+              <Tab href='logbook' label='Logbook' value='/logbook'/>
+            </Tabs>
+            </AppBar>
+          }
           <br />
-          <Route exact path="/" render={()=>(<Diary apiURL={apiURL}/>)}/>
-          <Route exact path="/logbook" render={()=>(<Logbook apiURL={apiURL}/>)}/>
+            <Route exact path='/login' component={LoginPage}/>
+            <Route exact path='/diary' component={Diary}/>
+            <Route exact path='/logbook' component={Logbook}/>
         </div>
       </Router>
     )
