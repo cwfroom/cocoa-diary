@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import { BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
-import { AppBar, Tabs, Tab, Button } from '@material-ui/core'
+import { BrowserRouter as Router, Route, Redirect, Link} from 'react-router-dom'
+import { AppBar, Tabs, Tab, Button, Toolbar } from '@material-ui/core'
 import Diary from './containers/Diary'
 import Logbook from './containers/Logbook'
 import LoginPage from './containers/LoginPage'
@@ -12,20 +12,22 @@ class App extends Component {
       <Router>
         <div className='App'>
 
-        <AppBar position='static'>
         {Auth.isLoggedIn() && 
-            <Tabs value={window.location.pathname}>
-              <Tab href='diary' label='Diary' value='/diary'/>
-              <Tab href='logbook' label='Logbook' value='/logbook'/>
+        <AppBar position='static'>
+            <Toolbar variant='dense'>
+              <Tabs value={window.location.pathname} style={{flex: 1}}>
+                <Tab component={Link} to='/diary' label='Diary' value='/diary'/>
+                <Tab component={Link} to='/logbook' label='Logbook' value='/logbook'/>
+              </Tabs>
               <Button
-                color='inherit'
-                onClick={Auth.logout}
+                  color='inherit'
+                  onClick={Auth.logout}
               >
                 Logout
               </Button>
-            </Tabs>
-        }
+            </Toolbar>
         </AppBar>
+        }
           <br />
             <Route path='/' render={() => {
               if (!Auth.isLoggedIn()) {
