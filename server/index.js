@@ -5,11 +5,11 @@ const fs = require('fs')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const basicAuth = require('express-basic-auth')
 
 // Custom modules
 const diary = require('./routes/diary')
 const logbook = require('./routes/logbook')
+const user = require('./routes/user')
 
 // Read config file, caching is fine
 const config = require('./config.json')
@@ -19,19 +19,12 @@ const port = 2638
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
-/*
-app.use(basicAuth({
-    users: {
-        'admin': config['Password']
-    },
-    challenge: true
-}))
-*/
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 })
 
 // Routing
-app.use('/diary', diary)
-app.use('/logbook', logbook)
+app.use('/api/diary', diary)
+app.use('/api/logbook', logbook)
+app.use('/api/user', user)
