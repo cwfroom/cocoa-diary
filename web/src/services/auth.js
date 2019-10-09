@@ -16,8 +16,9 @@ async function login (password) {
     
 function logout () {
     localStorage.removeItem('token')
+    window.location.replace('/')
 }
-    
+
 function isLoggedIn () {
     const token = localStorage.getItem('token')
     return (token && !isTokenExpired(token))
@@ -25,7 +26,7 @@ function isLoggedIn () {
 
 function isTokenExpired (token) {
     const decoded = decode(token)
-    return (decode.exp < Date.now() / 1000)
+    return (decoded.exp < Date.now() / 1000)
 }
 
 export const Auth = {

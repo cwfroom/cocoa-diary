@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
 import { BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
-import AppBar from '@material-ui/core/AppBar'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
+import { AppBar, Tabs, Tab, Button } from '@material-ui/core'
 import Diary from './containers/Diary'
 import Logbook from './containers/Logbook'
 import LoginPage from './containers/LoginPage'
@@ -13,22 +11,28 @@ class App extends Component {
     return (
       <Router>
         <div className='App'>
-        <Route path='/' render={() => {
-          if (!Auth.isLoggedIn()) {
-            return <Redirect to={{pathname:'/login'}}/>
-          }
-        }}
-        />
-        
-        {Auth.isLoggedIn() &&
-          <AppBar position='static'>
+
+        <AppBar position='static'>
+        {Auth.isLoggedIn() && 
             <Tabs value={window.location.pathname}>
               <Tab href='diary' label='Diary' value='/diary'/>
               <Tab href='logbook' label='Logbook' value='/logbook'/>
+              <Button
+                color='inherit'
+                onClick={Auth.logout}
+              >
+                Logout
+              </Button>
             </Tabs>
-            </AppBar>
-          }
+        }
+        </AppBar>
           <br />
+            <Route path='/' render={() => {
+              if (!Auth.isLoggedIn()) {
+                return <Redirect to={{pathname:'/login'}}/>
+              }
+            }}
+            />
             <Route exact path='/login' component={LoginPage}/>
             <Route exact path='/diary' component={Diary}/>
             <Route exact path='/logbook' component={Logbook}/>

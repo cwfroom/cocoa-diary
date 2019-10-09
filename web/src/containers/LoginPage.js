@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Box, Paper, Typography, TextField, Button } from '@material-ui/core'
+import { Box, Paper, TextField } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { Auth } from '../services/auth'
 
