@@ -11,7 +11,7 @@ async function login (password) {
     if (result.status === 0) {
         localStorage.setItem('token', result.token);
     }
-    return result.status
+        return result.status
     }
     
 function logout () {
@@ -29,8 +29,28 @@ function isTokenExpired (token) {
     return (decoded.exp < Date.now() / 1000)
 }
 
+async function authedFetch (route, body) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
+    return fetch(`${globals.apiURL}/${route}` , {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+    })
+    .then( (res) => {
+        if (res.status !== 200){
+            return null
+        }else {
+            return res.json()
+        }
+    })
+}
+
 export const Auth = {
     login,
     logout,
-    isLoggedIn
+    isLoggedIn,
+    authedFetch
 }

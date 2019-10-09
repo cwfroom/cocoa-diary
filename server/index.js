@@ -5,6 +5,7 @@ const fs = require('fs')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const exjwt = require('express-jwt')
 
 // Custom modules
 const diary = require('./routes/diary')
@@ -24,7 +25,11 @@ app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 })
 
+const checkToken = exjwt({
+    secret: config['Secret']
+})
+
 // Routing
-app.use('/api/diary', diary)
-app.use('/api/logbook', logbook)
+app.use('/api/diary', checkToken, diary)
+app.use('/api/logbook', checkToken, logbook)
 app.use('/api/user', user)

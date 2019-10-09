@@ -14,7 +14,7 @@ router.post('/login', (req, res) => {
         const token = jwt.sign({
             username: 'admin'
         },
-        'Hot Cocoa',
+        config['Secret'],
         {
             expiresIn: '7d'
         })

@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Box, List, ListItem, Snackbar } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import EditDialog from '../components/EditDialog'
-import { globals } from '../services/globals'
+import { Auth } from '../services/auth'
 
 const styles = {
     leftPanel: {
@@ -74,18 +74,8 @@ class Logbook extends Component {
     }
 
     logbookFetch = (route, body, callback) => {
-        const headers = {
-            'Content-Type': 'application/json'
-        }
-        fetch(`${globals.apiURL}/logbook/${route}` , {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(body)
-        })
-        .then( (res) => res.json())
-        .then( (result) => {
-            callback(result)
-        })
+        Auth.authedFetch(`logbook/${route}`, body)
+        .then(result => callback(result))
     }
 
     handleCategoryListClick = (value) => {
