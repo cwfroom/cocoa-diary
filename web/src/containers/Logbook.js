@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Box, List, ListItem, Snackbar } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import EditDialog from '../components/EditDialog'
+import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
 
 const styles = {
@@ -176,6 +177,8 @@ class Logbook extends Component {
         const {classes} = this.props
         return (
             <div>
+                <TabBar/>
+                <br />
                 <Box className={classes.leftPanel}>
                     <List className={classes.categoryList}>
                     {this.state.categories.map( (category, i) => 

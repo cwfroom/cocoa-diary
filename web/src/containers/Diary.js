@@ -4,6 +4,7 @@ import { Box, TextField, List, ListItem, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
 import { setTimeout, clearTimeout } from 'timers'
 import { Auth } from '../services/auth'
+import TabBar from '../components/TabBar';
 
 const styles = {
     diaryRoot: {
@@ -267,6 +268,8 @@ class Diary extends Component {
         const {classes} = this.props
         return (
             <div className={classes.diaryRoot}>
+                <TabBar/>
+                <br />
                 <Box className={classes.leftPanel}>
                     <Box className = {classes.inlineBox}>
                         <DropdownMenu 
