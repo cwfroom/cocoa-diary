@@ -97,11 +97,11 @@ class Logbook extends Component {
             let listCopy = [...state.list]
             let pendingChangesCopy = state.pendingChanges
             const realIndex = listCopy.length - state.selectedRow - 1
-            if (!pendingChangesCopy[realIndex]) {
-                pendingChangesCopy[realIndex] = {}
+            if (!pendingChangesCopy['Index']) {
+                pendingChangesCopy['Index'] = realIndex
             }
             listCopy[state.selectedRow][key] = value
-            pendingChangesCopy[realIndex][key] = value
+            pendingChangesCopy[key] = value
             return {
                 ...state,
                 list: listCopy,
@@ -225,6 +225,7 @@ class Logbook extends Component {
                     Queued: {Object.entries(this.state.pendingChanges).length}
                 </Box>
 
+                {Auth.isLoggedIn() &&
                 <EditDialog
                     openDialog={this.state.openDialog}
                     closeDialog={this.closeDialog}
@@ -232,7 +233,7 @@ class Logbook extends Component {
                     row={this.state.list[this.state.selectedRow]}
                     handleRowUpdate={this.handleRowUpdate}
                 />
-
+                }
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',

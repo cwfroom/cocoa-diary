@@ -4,6 +4,7 @@ const express = require('express')
 const router = express.Router()
 const path = require('path')
 const fs = require('fs')
+const exjwt = require('express-jwt')
 
 // Read config file, caching is fine
 const config = require('../config.json')
@@ -13,6 +14,10 @@ let fileCache = {}
 function getFilePath (name) {
     return path.join(config['DataPath'], 'logbook', name + '.zzd')
 }
+
+const checkToken = exjwt({
+    secret: config['Secret']
+})
 
 function openCategory (category, callback) {
     fs.readFile(getFilePath(category), (err, content) => {
@@ -27,18 +32,14 @@ function matchCache (category) {
 }
 
 function updateList (file, changes, callback) {
+    const index = changes['Index']
     let list = file['List']
-    const indices = Object.keys(changes)
     const keys = file['Columns']
-    indices.forEach(index => {
-        if (!(index in list)){
-            list[index] = {}
-        }
-        keys.forEach( key => {
-            if (changes[index][key]) {
-                list[index][key] = changes[index][key]
+    keys.forEach( key => {
+            if (changes[key]) {
+                if (!list[index]) list[index] = {}
+                list[index][key] = changes[key]
             }
-        })
     })
     file['List'] = list
     const filePath = getFilePath(file['Category'])
@@ -72,7 +73,7 @@ router.post('/category', (req, res) => {
     }
 })
 
-router.post('/submit', (req, res) => {
+router.post('/submit', checkToken, (req, res) => {
     const {category, changes} = req.body
     if (matchCache(category)){
         updateList(fileCache, changes, (result) => {

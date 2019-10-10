@@ -31,5 +31,5 @@ const checkToken = exjwt({
 
 // Routing
 app.use('/api/diary', checkToken, diary)
-app.use('/api/logbook', checkToken, logbook)
+app.use('/api/logbook', logbook)
 app.use('/api/user', user)
