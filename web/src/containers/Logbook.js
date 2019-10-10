@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Box, List, ListItem, Snackbar } from '@material-ui/core'
+import { Box, List, ListItem } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import EditDialog from '../components/EditDialog'
 import TabBar from '../components/TabBar'
@@ -41,9 +41,9 @@ class Logbook extends Component {
             columns: [],
             list: [],
             openDialog: false,
-            showSnackBar: false,
             selectedRow: 0,
-            pendingChanges: {}
+            pendingChanges: {},
+            statusMessage: ''
         }
     }
 
@@ -118,10 +118,9 @@ class Logbook extends Component {
             }
             this.logbookFetch('submit', body, (result) => {
                 this.setState({
-                    snackBarMessage: result['Result'],
-                    showSnackBar: true
+                    statusMessage: result['Result']
                 })
-                if (result['Result'] === 'Saved') {
+                if (result['Result'] !== 'Error') {
                     this.setState(
                         {pendingChanges: {}}
                     )
@@ -222,7 +221,7 @@ class Logbook extends Component {
                 </Box>
 
                 <Box className={classes.statusLabel}>
-                    Queued: {Object.entries(this.state.pendingChanges).length}
+                    {Auth.isLoggedIn() && this.state.statusMessage}
                 </Box>
 
                 {Auth.isLoggedIn() &&
@@ -234,16 +233,6 @@ class Logbook extends Component {
                     handleRowUpdate={this.handleRowUpdate}
                 />
                 }
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center'
-                    }}
-                    open={this.state.showSnackBar}
-                    autoHideDuration={3000}
-                    message={this.state.snackBarMessage}
-                    onClose={() => this.setState({showSnackBar:false})}
-                />
 
             </div>
         )

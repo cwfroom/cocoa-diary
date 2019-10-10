@@ -5,6 +5,7 @@ const router = express.Router()
 const path = require('path')
 const fs = require('fs')
 const exjwt = require('express-jwt')
+const moment = require('moment')
 
 // Read config file, caching is fine
 const config = require('../config.json')
@@ -47,7 +48,7 @@ function updateList (file, changes, callback) {
         if (err) {
             callback({'Result': 'Error'})
         }
-        callback({'Result': 'Saved'})
+        callback({'Result': 'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss Z')})
     })
 }
 
