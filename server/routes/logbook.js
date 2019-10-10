@@ -20,36 +20,37 @@ const checkToken = exjwt({
     secret: config['Secret']
 })
 
-function openCategory (category, callback) {
-    fs.readFile(getFilePath(category), (err, content) => {
-        if (err) callback('{}')
-        fileCache = JSON.parse(content)
-        callback(fileCache)
-    })
+function checkCache (category) {
+    if (fileCache['Category'] !== category){
+        fileCache = JSON.parse(fs.readFileSync(getFilePath(category), 'utf8'))
+    }
 }
 
-function matchCache (category) {
-    return fileCache['Category'] === category
+function saveFile () {
+    const filePath = getFilePath(fileCache['Category'])
+    fs.writeFileSync(filePath, JSON.stringify(fileCache))
 }
 
-function updateList (file, changes, callback) {
+function updateList (changes) {
     const index = changes['Index']
-    let list = file['List']
-    const keys = file['Columns']
+    let list = fileCache['List']
+    const keys = fileCache['Columns']
     keys.forEach( key => {
             if (changes[key]) {
                 if (!list[index]) list[index] = {}
                 list[index][key] = changes[key]
             }
     })
-    file['List'] = list
-    const filePath = getFilePath(file['Category'])
-    fs.writeFile(filePath, JSON.stringify(file), (err) => {
-        if (err) {
-            callback({'Result': 'Error'})
-        }
-        callback({'Result': 'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss Z')})
-    })
+    fileCache['List'] = list
+    saveFile()
+}
+
+function sendResult(res, success) {
+    if (success) {
+        res.send(JSON.stringify({Result:'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss Z')}))
+    }else{
+        res.send(JSON.stringify({Result:'Error'}))
+    }
 }
 
 router.post('/index', (req, res) => {
@@ -65,28 +66,25 @@ router.post('/index', (req, res) => {
 
 router.post('/category', (req, res) => {
     const {category} = req.body
-    if (matchCache(category)){
-        res.send(JSON.stringify(fileCache))
-    }else{
-        openCategory (category, (file) => {
-            res.send(JSON.stringify(file))
-        })
-    }
+    checkCache(category)
+    res.send(JSON.stringify(fileCache))
 })
 
 router.post('/submit', checkToken, (req, res) => {
     const {category, changes} = req.body
-    if (matchCache(category)){
-        updateList(fileCache, changes, (result) => {
-            res.send(JSON.stringify(result))
-        })
-    }else{
-        openCategory(category, (file) => {
-            updateList(file, changes, (result) => {
-                res.send(JSON.stringify(result))
-            })
-        })
+    try {
+        checkCache(category)
+        updateList(changes)
+        sendResult(res, true)
+    } catch (err) {
+        console.log(err)
+        sendResult(res, false)
     }
+})
+
+router.post('/delete', checkToken, (req, res) => {
+    const { index } = req.body
+    
 })
 
 // Force reload, mainly for debug purpose
