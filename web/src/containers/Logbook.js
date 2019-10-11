@@ -59,7 +59,8 @@ class Logbook extends Component {
     componentDidUpdate = (prevProps, prevState) => {
         if (prevState.categories.length !== this.state.categories.length || prevState.selectedIndex !== this.state.selectedIndex) {
             const body = {
-                category: this.state.categories[this.state.selectedIndex]
+                category: this.state.categories[this.state.selectedIndex],
+                selectedRow: null
             }
             this.logbookFetch('category', body, (result) => {
                 this.setState({
