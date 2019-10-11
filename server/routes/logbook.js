@@ -106,9 +106,8 @@ router.post('/insert', checkToken, (req, res) => {
 // Force reload, mainly for debug purpose
 router.post('/reload', (req, res) => {
     const {category} = req.body
-    openCategory (category, (file) => {
-        res.send(JSON.stringify(file))
-    })
+    fileCache = JSON.parse(fs.readFileSync(getFilePath(category), 'utf8'))
+    res.send(JSON.stringify(fileCache))
 })
 
 
