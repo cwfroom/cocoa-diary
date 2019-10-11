@@ -41,7 +41,7 @@ class Logbook extends Component {
             columns: [],
             list: [],
             openDialog: false,
-            selectedRow: 0,
+            selectedRow: null,
             pendingChanges: {},
             statusMessage: ''
         }
@@ -88,8 +88,12 @@ class Logbook extends Component {
     handleTableCellClick = (value) => {
         this.setState({
             selectedRow: value,
-            openDialog: true
         })
+        if (Auth.isLoggedIn()) {
+            this.setState({
+                openDialog: true
+            })
+        }
     }
 
     getRealIndex = () => {
@@ -252,7 +256,10 @@ class Logbook extends Component {
                             </TableRow>
                             }
                             {this.state.list.map( (entry, i) => 
-                                <TableRow key={'row-'+i}>
+                                <TableRow
+                                    key={'row-'+i}
+                                    selected={this.state.selectedRow === i}
+                                >
                                     {this.state.columns.map( (column) => 
                                         <TableCell
                                             key={i+column}
