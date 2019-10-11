@@ -160,8 +160,6 @@ class Logbook extends Component {
 
     handleInsert = () => {
         this.submitEdit('insert', this.getRealIndex())
-        console.log(this.state.selectedRow)
-        console.log(this.getRealIndex())
         this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.selectedRow + 1, 0, {})
