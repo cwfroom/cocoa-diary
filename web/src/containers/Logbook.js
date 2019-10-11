@@ -246,9 +246,11 @@ class Logbook extends Component {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                            {Auth.isLoggedIn() && 
                             <TableRow>
                                 <TableCell onClick={this.createEntry}>New...</TableCell>
                             </TableRow>
+                            }
                             {this.state.list.map( (entry, i) => 
                                 <TableRow key={'row-'+i}>
                                     {this.state.columns.map( (column) => 
