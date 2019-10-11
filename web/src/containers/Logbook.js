@@ -93,7 +93,7 @@ class Logbook extends Component {
     }
 
     getRealIndex = () => {
-        const realIndex = this.state.list.length - this.state.selectedRow - 1
+        return this.state.list.length - this.state.selectedRow - 1
     }
 
     handleRowUpdate = (key, value) => {
@@ -146,6 +146,7 @@ class Logbook extends Component {
     }
 
     handleDelete = () => {
+        this.submitEdit('delete', this.getRealIndex())
         this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.selectedRow, 1)
@@ -155,7 +156,21 @@ class Logbook extends Component {
                 list: listCopy
             }
         })
-        this.submitEdit('delete', this.getRealIndex())
+    }
+
+    handleInsert = () => {
+        this.submitEdit('insert', this.getRealIndex())
+        console.log(this.state.selectedRow)
+        console.log(this.getRealIndex())
+        this.setState( (state) => {
+            let listCopy = [...state.list]
+            listCopy.splice(this.state.selectedRow + 1, 0, {})
+            return {
+                ...state,
+                openDialog: false,
+                list: listCopy
+            }
+        })
     }
 
     createEntry = () => {
@@ -242,7 +257,7 @@ class Logbook extends Component {
                                         <TableCell
                                             key={i+column}
                                             onClick={this.handleTableCellClick.bind(this, i)}>
-                                        {entry[column]}
+                                        {(entry && entry[column]) ? entry[column] : ''}
                                         </TableCell>
                                     )}
                                 </TableRow>
@@ -264,6 +279,7 @@ class Logbook extends Component {
                     row={this.state.list[this.state.selectedRow]}
                     handleRowUpdate={this.handleRowUpdate}
                     handleDelete={this.handleDelete}
+                    handleInsert={this.handleInsert}
                 />
                 }
 

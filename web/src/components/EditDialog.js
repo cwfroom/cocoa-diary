@@ -46,8 +46,11 @@ class EditDialog extends Component {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.props.handleDelete} color="primary">
+                    <Button onClick={this.props.handleDelete} color="secondary">
                         Delete
+                    </Button>
+                    <Button onClick={this.props.handleInsert} color="primary">
+                        Insert
                     </Button>
                     <Button onClick={this.handleClose} color="primary">
                         Close

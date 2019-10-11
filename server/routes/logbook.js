@@ -44,10 +44,12 @@ function updateEntry (changes) {
     fileCache['List'] = list
 }
 
-function deleteEntry ( index ) {
-    let list = fileCache['List']
-    list.splice(index, 1)
-    fileCache['List'] = list
+function deleteEntry (index) {
+    fileCache['List'].splice(index, 1)
+}
+
+function insertEntry (index) {
+    fileCache['List'].splice(index, 0, {})
 }
 
 function sendResult(res, success) {
@@ -75,30 +77,30 @@ router.post('/category', (req, res) => {
     res.send(JSON.stringify(fileCache))
 })
 
-router.post('/submit', checkToken, (req, res) => {
-    const {category, changes} = req.body
+function generalHandler (req, res, handler, key) {
+    const { category } = req.body
+    const data = req.body[key]
     try {
         checkCache(category)
-        updateEntry(changes)
+        handler(data)
         saveFile()
         sendResult(res, true)
     } catch (err) {
         console.log(err)
         sendResult(res, false)
     }
+}
+
+router.post('/submit', checkToken, (req, res) => {
+    generalHandler(req, res, updateEntry, 'changes')
 })
 
 router.post('/delete', checkToken, (req, res) => {
-    const { category, index } = req.body
-    try {
-        checkCache(category)
-        deleteEntry(index)
-        saveFile()
-        sendResult(res, true)
-    } catch (err) {
-        console.log(err)
-        sendResult(res, false)
-    }
+    generalHandler(req, res, deleteEntry, 'index')
+})
+
+router.post('/insert', checkToken, (req, res) => {
+    generalHandler(req, res, insertEntry, 'index')
 })
 
 // Force reload, mainly for debug purpose
