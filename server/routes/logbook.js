@@ -31,7 +31,7 @@ function saveFile () {
     fs.writeFileSync(filePath, JSON.stringify(fileCache))
 }
 
-function updateList (changes) {
+function updateEntry (changes) {
     const index = changes['Index']
     let list = fileCache['List']
     const keys = fileCache['Columns']
@@ -42,12 +42,17 @@ function updateList (changes) {
             }
     })
     fileCache['List'] = list
-    saveFile()
+}
+
+function deleteEntry ( index ) {
+    let list = fileCache['List']
+    list.splice(index, 1)
+    fileCache['List'] = list
 }
 
 function sendResult(res, success) {
     if (success) {
-        res.send(JSON.stringify({Result:'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss Z')}))
+        res.send(JSON.stringify({Result:'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss')}))
     }else{
         res.send(JSON.stringify({Result:'Error'}))
     }
@@ -74,7 +79,8 @@ router.post('/submit', checkToken, (req, res) => {
     const {category, changes} = req.body
     try {
         checkCache(category)
-        updateList(changes)
+        updateEntry(changes)
+        saveFile()
         sendResult(res, true)
     } catch (err) {
         console.log(err)
@@ -83,8 +89,16 @@ router.post('/submit', checkToken, (req, res) => {
 })
 
 router.post('/delete', checkToken, (req, res) => {
-    const { index } = req.body
-    
+    const { category, index } = req.body
+    try {
+        checkCache(category)
+        deleteEntry(index)
+        saveFile()
+        sendResult(res, true)
+    } catch (err) {
+        console.log(err)
+        sendResult(res, false)
+    }
 })
 
 // Force reload, mainly for debug purpose

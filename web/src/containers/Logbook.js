@@ -92,11 +92,15 @@ class Logbook extends Component {
         })
     }
 
+    getRealIndex = () => {
+        const realIndex = this.state.list.length - this.state.selectedRow - 1
+    }
+
     handleRowUpdate = (key, value) => {
         this.setState( (state) => {
             let listCopy = [...state.list]
             let pendingChangesCopy = state.pendingChanges
-            const realIndex = listCopy.length - state.selectedRow - 1
+            const realIndex = state.list.length - state.selectedRow - 1
             if (!pendingChangesCopy['Index']) {
                 pendingChangesCopy['Index'] = realIndex
             }
@@ -127,6 +131,31 @@ class Logbook extends Component {
                 }
             })
         }
+    }
+
+    submitEdit = (action, index) => {
+        const body = {
+            'category': this.state.categories[this.state.selectedIndex],
+            'index': index
+        }
+        this.logbookFetch(action, body, (result) => {
+            this.setState({
+                statusMessage: result['Result']
+            })
+        })
+    }
+
+    handleDelete = () => {
+        this.setState( (state) => {
+            let listCopy = [...state.list]
+            listCopy.splice(this.state.selectedRow, 1)
+            return {
+                ...state,
+                openDialog: false,
+                list: listCopy
+            }
+        })
+        this.submitEdit('delete', this.getRealIndex())
     }
 
     createEntry = () => {
@@ -234,6 +263,7 @@ class Logbook extends Component {
                     columns={this.state.columns}
                     row={this.state.list[this.state.selectedRow]}
                     handleRowUpdate={this.handleRowUpdate}
+                    handleDelete={this.handleDelete}
                 />
                 }
 
