@@ -1,6 +1,4 @@
 {
-    "StoreURL": "https://store.playstation.com/ja-jp/home/games",
-    "StoreRegion": "JP",
-    "PSNEmail": "",
-    "PSNPassword": ""
+    "ListURL": "https://store.playstation.com/ja-jp/download/list",
+    "StoreRegion": "JP"
 }
