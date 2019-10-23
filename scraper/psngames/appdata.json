@@ -1,4 +1,7 @@
 {
-    "ListURL": "https://store.playstation.com/ja-jp/download/list",
-    "StoreRegion": "JP"
+    "JP" : {
+        "ListURL": "https://store.playstation.com/ja-jp/download/list",
+        "Game": "ゲーム",
+        "DateFormat": "YYYY.MM.DD"
+    }
 }
