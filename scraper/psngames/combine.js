@@ -71,7 +71,7 @@ async function handler () {
     sortByDate()
     const result = {
         Catetory: 'PSN',
-        Columns: ['Title', 'Regions', 'Platform', 'Release', 'Media', 'Status'],
+        Columns: ['Title', 'Region', 'Platform', 'Release', 'Media', 'Status'],
         List: list
     }
     fs.writeFileSync(path.join(__dirname, 'PSN.zzd'), JSON.stringify(result))
