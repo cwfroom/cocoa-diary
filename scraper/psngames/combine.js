@@ -70,7 +70,7 @@ async function handler () {
     addAttr()
     sortByDate()
     const result = {
-        Catetory: 'PSN',
+        Category: 'PSN',
         Columns: ['Title', 'Region', 'Platform', 'Release', 'Media', 'Status'],
         List: list
     }
