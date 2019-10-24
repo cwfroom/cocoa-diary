@@ -1,8 +1,6 @@
 'use strict'
 const path = require('path')
 const fs = require('fs')
-const util = require('util')
-const request = require('request')
 const rp = require('request-promise')
 const puppeteer = require('puppeteer-core')
 const cheerio = require('cheerio')
