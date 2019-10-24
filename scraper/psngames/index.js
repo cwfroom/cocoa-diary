@@ -34,9 +34,13 @@ async function parseAll () {
     while (hasNext(html)) {
         const nextPageNav = await listPage.$('.download-top-controls .paginator-control__next')
         list = list.concat(await parsePage(html))
-        await nextPageNav.click()
-        await listPage.waitForSelector('div.download-list')
-        html = await listPage.content()
+        if (nextPageNav) {
+            await nextPageNav.click()
+            await listPage.waitForSelector('div.download-list')
+            html = await listPage.content()
+        } else {
+            break
+        }
     }
     const result = {
         "Category": `PSN-${locale}`,
@@ -96,7 +100,8 @@ async function getReleaseDate (link) {
     const html = await rp(`https://store.playstation.com${link}`)
     const $ = cheerio.load(html)
     // Second info item
-    const releaseDate = $('.provider-info__list-item', '.provider-info__text').eq(1).text().trim()
+    let releaseDate = $('.provider-info__list-item', '.provider-info__text').eq(1).text().trim()
+    releaseDate = releaseDate.split(' ').slice(1).join(' ')
     // Normalize date to ISO 8601 extended format
     const normalized = moment(releaseDate, appdata[locale].DateFormat).format('YYYY-MM-DD')
     return normalized
