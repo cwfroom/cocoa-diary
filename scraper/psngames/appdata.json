@@ -1,7 +1,22 @@
 {
-    "JP" : {
+    "JP": {
         "ListURL": "https://store.playstation.com/ja-jp/download/list",
         "Game": "ゲーム",
+        "DateFormat": "YYYY.MM.DD"
+    },
+    "US": {
+        "ListURL": "https://store.playstation.com/en-us/download/list",
+        "Game": "Game",
+        "DateFormat": "MMM DD, YYYY"
+    },
+    "HK": {
+        "ListURL": "https://store.playstation.com/zh-hant-hk/download/list",
+        "Game": "遊戲",
+        "DateFormat": "YYYY.MM.DD"
+    },
+    "CN": {
+        "ListURL": "https://store.playstation.com/zh-hans-cn/download/list",
+        "Game": "游戏",
         "DateFormat": "YYYY.MM.DD"
     }
 }
