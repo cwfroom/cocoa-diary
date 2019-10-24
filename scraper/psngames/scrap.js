@@ -42,7 +42,7 @@ async function parseAll () {
     }
     const result = {
         "Category": `PSN-${locale}`,
-        "Columns": JSON.stringify(['Title', 'Account', 'Platform', 'Release']),
+        "Columns": JSON.stringify(['Title', 'Region', 'Platform', 'Release']),
         "List": list
     }
     const outputPath = path.join(__dirname, '/raw/', `${locale}.json`)
@@ -85,7 +85,7 @@ async function parsePage (html) {
             console.log(`${title} ${platform.join(', ')} ${releaseDate}`)
             list.push({
                 'Title': title,
-                'Account': locale,
+                'Region': locale,
                 'Platform': platform.join(', '),
                 'Release': releaseDate
             })
