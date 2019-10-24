@@ -28,15 +28,33 @@ async function connectChrome () {
 }
 
 async function parseAll () {
+    let list = []
     await listPage.waitForSelector('div.download-list')
-    const html = await listPage.content()
-    let list
-    list = list.connect(await parsePage(html))
-    console.log(list)
+    let html = await listPage.content()
+    while (hasNext(html)) {
+        const nextPageNav = await listPage.$('.download-top-controls .paginator-control__next')
+        list = list.concat(await parsePage(html))
+        await nextPageNav.click()
+        await listPage.waitForSelector('div.download-list')
+        html = await listPage.content()
+    }
     const result = {
         "Category": `PSN-${locale}`,
         "Columns": JSON.stringify(['Title', 'Account', 'Platform', 'Release']),
         "List": list
+    }
+    const outputPath = path.join(__dirname, '/raw/', `${locale}.json`)
+    fs.writeFile(outputPath, JSON.stringify(result), err => {
+        if (err) console.log(err)
+    })
+}
+
+function hasNext(html) {
+    const $ = cheerio.load(html)
+    if ($('.paginator-control__next', '.download-top-controls').hasClass('paginator-control__arrow-navigation--disabled')) {
+        return false
+    }else{
+        return true
     }
 }
 
@@ -56,7 +74,13 @@ async function parsePage (html) {
             $('a', '.download-list-item__playable-on-info', element).each( (index, element) => {
                 platform.push($(element).text())
             })
-            const releaseDate = await getReleaseDate(link)
+            let releaseDate = ''
+            try {
+                releaseDate = await getReleaseDate(link)
+            }catch (err) {
+                console.log(`Error when obtaining release date for ${title}`)
+            }
+            console.log(`${title} ${platform.join(', ')} ${releaseDate}`)
             list.push({
                 'Title': title,
                 'Account': locale,
