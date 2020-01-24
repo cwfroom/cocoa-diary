@@ -61,14 +61,8 @@ function sendResult(res, success) {
 }
 
 router.post('/index', (req, res) => {
-    fs.readdir(path.join(config['DataPath'], 'logbook'), (err, files) => {
-        if (err) res.send('[]')
-        files.forEach( (filename, index) => {
-            // Remove file extensions
-            files[index] = filename.replace(/\.[^/.]+$/, "")
-        })
-        res.send(JSON.stringify(files))
-    })
+    const fileIndex = fs.readFileSync(path.join(config['DataPath'], 'logbook', 'index.zzd'), 'utf-8')
+    res.send(fileIndex)
 })
 
 router.post('/category', (req, res) => {
