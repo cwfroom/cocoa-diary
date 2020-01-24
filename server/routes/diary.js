@@ -28,8 +28,13 @@ function openMonth (year, month, callback) {
                 Month: month,
                 List: []
             }
+            const yearPath = path.join(config['DataPath'], year.toString())
+            if (!fs.existsSync(yearPath)){
+                fs.mkdirSync(yearPath)
+            }
             fs.writeFile(getFilePath(year, month), JSON.stringify(newMonth), (err) => {
                 console.log('Failed to create new month file')
+                console.log(err)
             })
             callback('')
         }else{
