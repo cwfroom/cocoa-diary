@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const path = require('path')
 const fs = require('fs')
-const moment = require('moment')
+const date = new Date()
 
 // Read config file, caching is fine
 const config = require('../config.json')
@@ -72,9 +72,9 @@ function updateList(file, changes, callback) {
     const filePath = getFilePath(file['Year'], file['Month'])
     fs.writeFile(filePath, JSON.stringify(file), (err) => {
         if (err) {
-            callback({'Result': 'Error'})
+            callback({'Result': 'Error', 'Timestamp': date.getTime() / 1000})
         }
-        callback({'Result': 'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss Z')})
+        callback({'Result': 'Saved', 'Timestamp': date.getTime() / 1000})
     })
 }
 

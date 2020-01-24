@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles'
 import { Box, TextField, List, ListItem, Button } from '@material-ui/core'
 import DropdownMenu from '../components/DropdownMenu'
 import { setTimeout, clearTimeout } from 'timers'
 import { Auth } from '../services/auth'
-import TabBar from '../components/TabBar';
+import TabBar from '../components/TabBar'
+import moment from 'moment'
 
 const styles = {
     diaryRoot: {
@@ -250,7 +251,7 @@ class Diary extends Component {
             }
             this.diaryFetch('submit', body, (result) => {
                 this.setState({
-                    statusMessage: result['Result']
+                    statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
                 })
             })
             this.setState(

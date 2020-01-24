@@ -5,7 +5,7 @@ const router = express.Router()
 const path = require('path')
 const fs = require('fs')
 const exjwt = require('express-jwt')
-const moment = require('moment')
+const date = new Date()
 
 // Read config file, caching is fine
 const config = require('../config.json')
@@ -54,9 +54,9 @@ function insertEntry (index) {
 
 function sendResult(res, success) {
     if (success) {
-        res.send(JSON.stringify({Result:'Saved ' + moment().format('YYYY/MM/DD HH:mm:ss')}))
+        res.send({'Result': 'Saved', 'Timestamp': date.getTime() / 1000})
     }else{
-        res.send(JSON.stringify({Result:'Error'}))
+        res.send({'Result': 'Error', 'Timestamp': date.getTime() / 1000})
     }
 }
 

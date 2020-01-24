@@ -5,6 +5,7 @@ import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/c
 import EditDialog from '../components/EditDialog'
 import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
+import moment from 'moment'
 
 const styles = {
     leftPanel: {
@@ -127,7 +128,7 @@ class Logbook extends Component {
             }
             this.logbookFetch('submit', body, (result) => {
                 this.setState({
-                    statusMessage: result['Result']
+                    statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
                 })
                 if (result['Result'] !== 'Error') {
                     this.setState(
@@ -145,7 +146,7 @@ class Logbook extends Component {
         }
         this.logbookFetch(action, body, (result) => {
             this.setState({
-                statusMessage: result['Result']
+                statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
             })
         })
     }
