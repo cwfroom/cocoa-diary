@@ -289,6 +289,7 @@ class Logbook extends Component {
                     handleRowUpdate={this.handleRowUpdate}
                     handleDelete={this.handleDelete}
                     handleInsert={this.handleInsert}
+                    enableComments={true}
                 />
                 }
 

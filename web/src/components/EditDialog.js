@@ -22,8 +22,8 @@ class EditDialog extends Component {
         this.props.handleRowUpdate(key, event.target.value)
     }
 
-    handlePressEnter = (event) => {
-        if (event.key === 'Enter') {
+    handlePressCtrlEnter = (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
             this.handleClose()
         }
     }
@@ -41,9 +41,20 @@ class EditDialog extends Component {
                             label={column}
                             value={(this.props.row && this.props.row[column]) ? this.props.row[column] : ''}
                             onChange={this.handleTextFieldUpdate(column)}
-                            onKeyDown={this.handlePressEnter}
+                            onKeyDown={this.handlePressCtrlEnter}
                         />
                     )}
+                    {this.props.enableComments &&
+                            <TextField
+                            fullWidth
+                            multiline
+                            key='textfield-comments'
+                            label='Comments'
+                            value={(this.props.row && this.props.row['Comments']) ? this.props.row['Comments'] : ''}
+                            onChange={this.handleTextFieldUpdate('Comments')}
+                            onKeyDown={this.handlePressCtrlEnter}
+                        />
+                    }
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.props.handleDelete} color="secondary">

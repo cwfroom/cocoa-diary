@@ -40,6 +40,9 @@ function updateEntry (changes) {
                 list[index][key] = changes[key]
             }
     })
+    if (changes['Comments']) {
+        list[index]['Comments'] = changes['Comments']
+    }
     fileCache['List'] = list
 }
 
