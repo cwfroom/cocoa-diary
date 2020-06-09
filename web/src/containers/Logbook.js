@@ -88,13 +88,17 @@ class Logbook extends Component {
     }
 
     handleTableCellClick = (value) => {
-        this.setState({
-            selectedRow: value,
-        })
         if (Auth.isLoggedIn()) {
-            this.setState({
-                openDialog: true
-            })
+            if (value === this.state.selectedRow) {
+                this.setState({
+                    selectedRow: value,
+                    openDialog: true
+                })
+            }else {
+                this.setState({
+                    selectedRow: value
+                })
+            }
         }
     }
 
