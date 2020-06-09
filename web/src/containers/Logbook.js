@@ -103,7 +103,11 @@ class Logbook extends Component {
     }
 
     getRealIndex = () => {
-        return this.state.list.length - this.state.selectedRow - 1
+        if (this.state.selectedRow === null) {
+            return null
+        }else {
+            return this.state.list.length - this.state.selectedRow - 1
+        }
     }
 
     handleRowUpdate = (key, value) => {
@@ -193,6 +197,37 @@ class Logbook extends Component {
         })
     }
 
+    swapEntry = (direction) => {
+        const realIndex = this.getRealIndex()
+        if (realIndex !== null) {
+            if (direction === 'up') {
+                if (realIndex < this.state.list.length) {
+                    this.submitEdit('swap', [realIndex, realIndex + 1])
+                    this.localSwap(this.state.selectedRow, this.state.selectedRow - 1)
+                }
+            }else if (direction === 'down'){
+                if (realIndex > 0) {
+                    this.submitEdit('swap', [realIndex, realIndex - 1])
+                    this.localSwap(this.state.selectedRow, this.state.selectedRow + 1)
+                }
+            }
+        }
+    }
+
+    localSwap = (index, other) => {
+        this.setState( (state) => {
+            let listCopy = [...state.list]
+            let temp = listCopy[index]
+            listCopy[index] = listCopy[other]
+            listCopy[other] = temp
+            return {
+                ...state,
+                list: listCopy,
+                selectedRow: other
+            }
+        })
+    }
+
     hotKeys = (event) => {
         if (Auth.isLoggedIn() && event.ctrlKey && event.altKey) {
             if (event.key === 'n' || event.key === 'N') {
@@ -201,6 +236,10 @@ class Logbook extends Component {
                 this.submitChanges()
             }else if (event.key === 'r' || event.key === 'R') {
                 this.forceReload()
+            }else if (event.key === 'ArrowUp') {
+                this.swapEntry('up')
+            }else if (event.key === 'ArrowDown') {
+                this.swapEntry('down')
             }
         }
     }

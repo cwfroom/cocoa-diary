@@ -54,6 +54,12 @@ function insertEntry (index) {
     fileCache['List'].splice(index, 0, {})
 }
 
+function swapEntry (index) {
+    let temp = fileCache['List'][index[0]]
+    fileCache['List'][index[0]] = fileCache['List'][index[1]]
+    fileCache['List'][index[1]] = temp
+ }
+
 function sendResult(res, success) {
     if (success) {
         res.send({'Result': 'Saved', 'Timestamp': Date.now() / 1000})
@@ -97,6 +103,10 @@ router.post('/delete', checkToken, (req, res) => {
 
 router.post('/insert', checkToken, (req, res) => {
     generalHandler(req, res, insertEntry, 'index')
+})
+
+router.post('/swap', checkToken, (req, res) => {
+    generalHandler(req, res, swapEntry, 'index')
 })
 
 // Force reload, mainly for debug purpose
