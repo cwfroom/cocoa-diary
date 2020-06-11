@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer-core')
 const cheerio = require('cheerio')
 const appdata = require('./appdata.json')
 
-let locale
+let locale, isUpdate
 let browser, listPage
 
 async function connectChrome () {
@@ -40,12 +40,12 @@ async function parseList () {
         }
     }
     const result = {
-        "Category": `PSN-${locale}`,
-        "Columns": JSON.stringify(['Title', 'Region', 'Platform', 'Release']),
-        "List": list
+        "Category": `PSN${locale}`,
+        "Columns": ['Title', 'Platform', 'Status'],
+        "List": list.reverse()
     }
-    const outputPath = path.join(__dirname, '/raw/', `PSN${locale}.json`)
-    fs.writeFile(outputPath, JSON.stringify(result), err => {
+    
+    fs.writeFile(appdata[locale].Output, JSON.stringify(result, null, '\t'), err => {
         if (err) console.log(err)
     })
 }
@@ -59,6 +59,14 @@ function hasNext(html) {
     }
 }
 
+function includesIgnore(title, locale) {
+    const list = appdata[locale].IgnoreList
+    for (let i = 0; i < list.length; i++) {
+        if (title.includes(list[i])) return true
+    }
+    return false
+}
+
 async function parsePage (html) {
     let list = []
     const $ = cheerio.load(html)
@@ -66,10 +74,9 @@ async function parsePage (html) {
     for ( let i = 0; i < $('.download-list-item').length; i++) {
         const element = $('.download-list-item').get(i)
         const type = $('.download-list-item__metadata', element).text()
-        // Only interested in games
-        if (type.includes(appdata[locale].Game)) {
-            const title = $('.download-list-item__title', element).text().trim()
-            const link = $('.download-list-item__title', element).attr('href')
+        const title = $('.download-list-item__title', element).text().trim()
+        // Only interested in games. It's impossible to filter every title, manual edit is still required.
+        if (type.includes(appdata[locale].Game) && !includesIgnore(title, locale)) {
             // In case of multiple platforms
             let platform = []
             $('a', '.download-list-item__playable-on-info', element).each( (index, element) => {

@@ -2,21 +2,29 @@
     "JP": {
         "ListURL": "https://store.playstation.com/ja-jp/download/list",
         "Game": "ゲーム",
-        "DateFormat": "YYYY.MM.DD"
+        "DateFormat": "YYYY.MM.DD",
+        "Output": "X:\\My Drive\\Diary\\Data\\Logbook\\PSNJP.zzd",
+        "IgnoreList": ["アバター","テーマ","パック","セット","サウンドトラック","体験版","基本無料","アプリ"]
     },
     "US": {
         "ListURL": "https://store.playstation.com/en-us/download/list",
         "Game": "Game",
-        "DateFormat": "MMM DD, YYYY"
+        "DateFormat": "MMM DD, YYYY",
+        "Output": "X:\\My Drive\\Diary\\Data\\Logbook\\PSNUS.zzd",
+        "IgnoreList": []
     },
     "HK": {
         "ListURL": "https://store.playstation.com/zh-hant-hk/download/list",
         "Game": "遊戲",
-        "DateFormat": "YYYY.MM.DD"
+        "DateFormat": "YYYY.MM.DD",
+        "Output": "X:\\My Drive\\Diary\\Data\\Logbook\\PSNHK.zzd",
+        "IgnoreList": []
     },
     "CN": {
         "ListURL": "https://store.playstation.com/zh-hans-cn/download/list",
         "Game": "游戏",
-        "DateFormat": "YYYY.MM.DD"
+        "DateFormat": "YYYY.MM.DD",
+        "Output": "X:\\My Drive\\Diary\\Data\\Logbook\\PSNCN.zzd",
+        "IgnoreList": []
     }
 }
