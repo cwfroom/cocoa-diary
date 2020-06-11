@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer-core')
 const cheerio = require('cheerio')
 const appdata = require('./appdata.json')
 
-let locale, isUpdate
+let locale, doParseAll
 let browser, listPage
 
 async function connectChrome () {
@@ -41,7 +41,7 @@ async function parseList () {
     }
     const result = {
         "Category": `PSN${locale}`,
-        "Columns": ['Title', 'Platform', 'Status'],
+        "Columns": ['Title', 'platforms', 'Status'],
         "List": list.reverse()
     }
     
@@ -67,6 +67,16 @@ function includesIgnore(title, locale) {
     return false
 }
 
+function filterPS3(platforms) {
+    if (platforms.length > 1 ) {
+        const i = platforms.indexOf('PS3')
+        if (i > -1) {
+            return platforms.splice(1, i)
+        }
+    }
+    return platforms
+}
+
 async function parsePage (html) {
     let list = []
     const $ = cheerio.load(html)
@@ -78,14 +88,16 @@ async function parsePage (html) {
         // Only interested in games. It's impossible to filter every title, manual edit is still required.
         if (type.includes(appdata[locale].Game) && !includesIgnore(title, locale)) {
             // In case of multiple platforms
-            let platform = []
+            let platforms = []
             $('a', '.download-list-item__playable-on-info', element).each( (index, element) => {
-                platform.push($(element).text())
+                platforms.push($(element).text())
             })
-            console.log(`${title} ${platform.join(', ')}`)
+            // Some games are only downloadable on PS3, doesn't make sense to include
+            platforms = filterPS3(platforms)
+            console.log(`${title} ${platforms.join(', ')}`)
             list.push({
                 'Title': title,
-                'Platform': platform.join(', '),
+                'platforms': platforms.join(', '),
                 'Status': ''
             })
         }
@@ -99,6 +111,7 @@ async function handler () {
         console.log('Region undefined or unsupported region')
         return
     }
+    doParseAll = process.argv[3]==='all' ? true : false
     await connectChrome()
     await parseList()
     await listPage.close()
