@@ -4,7 +4,6 @@ const fs = require('fs')
 const rp = require('request-promise')
 const puppeteer = require('puppeteer-core')
 const cheerio = require('cheerio')
-const moment = require('moment')
 const appdata = require('./appdata.json')
 
 let locale
@@ -25,7 +24,7 @@ async function connectChrome () {
     await listPage.goto(appdata[locale].ListURL, { waituntil:'domcontentloaded' })
 }
 
-async function parseAll () {
+async function parseList () {
     let list = []
     await listPage.waitForSelector('div.download-list')
     let html = await listPage.content()
@@ -45,7 +44,7 @@ async function parseAll () {
         "Columns": JSON.stringify(['Title', 'Region', 'Platform', 'Release']),
         "List": list
     }
-    const outputPath = path.join(__dirname, '/raw/', `${locale}.json`)
+    const outputPath = path.join(__dirname, '/raw/', `PSN${locale}.json`)
     fs.writeFile(outputPath, JSON.stringify(result), err => {
         if (err) console.log(err)
     })
@@ -76,33 +75,15 @@ async function parsePage (html) {
             $('a', '.download-list-item__playable-on-info', element).each( (index, element) => {
                 platform.push($(element).text())
             })
-            let releaseDate = ''
-            try {
-                releaseDate = await getReleaseDate(link)
-            }catch (err) {
-                console.log(`Error when obtaining release date for ${title}`)
-            }
-            console.log(`${title} ${platform.join(', ')} ${releaseDate}`)
+            console.log(`${title} ${platform.join(', ')}`)
             list.push({
                 'Title': title,
-                'Region': locale,
                 'Platform': platform.join(', '),
-                'Release': releaseDate
+                'Status': ''
             })
         }
     }
     return list
-}
-
-async function getReleaseDate (link) {
-    const html = await rp(`https://store.playstation.com${link}`)
-    const $ = cheerio.load(html)
-    // Second info item
-    let releaseDate = $('.provider-info__list-item', '.provider-info__text').eq(1).text().trim()
-    releaseDate = releaseDate.split(' ').slice(1).join(' ')
-    // Normalize date to ISO 8601 extended format
-    const normalized = moment(releaseDate, appdata[locale].DateFormat).format('YYYY-MM-DD')
-    return normalized
 }
 
 async function handler () {
@@ -112,7 +93,7 @@ async function handler () {
         return
     }
     await connectChrome()
-    await parseAll()
+    await parseList()
     await listPage.close()
     process.exit()
 }
