@@ -160,8 +160,10 @@ class Logbook extends Component {
     }
 
     handleDelete = () => {
-        this.submitEdit('delete', this.getRealIndex())
-        this.setState( (state) => {
+        let realIndex = this.getRealIndex()
+        if (realIndex !== null) {
+            this.submitEdit('delete', realIndex)
+            this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.selectedRow, 1)
             return {
@@ -170,6 +172,7 @@ class Logbook extends Component {
                 list: listCopy
             }
         })
+        }
     }
 
     handleInsert = () => {
@@ -229,17 +232,23 @@ class Logbook extends Component {
     }
 
     hotKeys = (event) => {
-        if (Auth.isLoggedIn() && event.ctrlKey && event.altKey) {
-            if (event.key === 'n' || event.key === 'N') {
-                this.createEntry()
-            }else if (event.key === 's' || event.key === 'S') {
-                this.submitChanges()
-            }else if (event.key === 'r' || event.key === 'R') {
-                this.forceReload()
-            }else if (event.key === 'ArrowUp') {
-                this.swapEntry('up')
-            }else if (event.key === 'ArrowDown') {
-                this.swapEntry('down')
+        if (Auth.isLoggedIn()) {
+            if (event.ctrlKey && event.altKey) {
+                if (event.key === 'n' || event.key === 'N') {
+                    this.createEntry()
+                }else if (event.key === 's' || event.key === 'S') {
+                    this.submitChanges()
+                }else if (event.key === 'r' || event.key === 'R') {
+                    this.forceReload()
+                }else if (event.key === 'ArrowUp') {
+                    this.swapEntry('up')
+                }else if (event.key === 'ArrowDown') {
+                    this.swapEntry('down')
+                }
+            }else {
+                if (event.key === 'Delete') {
+                    this.handleDelete()
+                }
             }
         }
     }
