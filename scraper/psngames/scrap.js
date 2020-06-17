@@ -8,6 +8,7 @@ const appdata = require('./appdata.json')
 
 let locale, doParseAll
 let browser, listPage
+let list, knownTitles
 
 async function connectChrome () {
     let debugInfo
@@ -25,12 +26,22 @@ async function connectChrome () {
 }
 
 async function parseList () {
-    let list = []
+    list = []
+    if (!doParseAll) {
+        let prevFile = JSON.parse(fs.readFileSync(appdata[locale].Output, {encoding:'utf-8'}))
+        list = prevFile.List.reverse()
+        knownTitles = []
+        list.forEach(item => {
+            knownTitles.push(item['Title'])
+        })
+    }
     await listPage.waitForSelector('div.download-list')
     let html = await listPage.content()
     while (hasNext(html)) {
         const nextPageNav = await listPage.$('.download-top-controls .paginator-control__next')
-        list = list.concat(await parsePage(html))
+        const pageResult = parsePage(html)
+        list = list.concat(pageResult.result)
+        if (pageResult.stop) break
         if (nextPageNav) {
             await nextPageNav.click()
             await listPage.waitForSelector('div.download-list')
@@ -41,7 +52,7 @@ async function parseList () {
     }
     const result = {
         "Category": `PSN${locale}`,
-        "Columns": ['Title', 'platforms', 'Status'],
+        "Columns": ['Title', 'Platform', 'Status'],
         "List": list.reverse()
     }
     
@@ -67,42 +78,53 @@ function includesIgnore(title, locale) {
     return false
 }
 
-function filterPS3(platforms) {
-    if (platforms.length > 1 ) {
-        const i = platforms.indexOf('PS3')
-        if (i > -1) {
-            return platforms.splice(1, i)
+function filterPlatform(platform) {
+    if (platform.length > 1 ) {
+        if (platform.includes('PSP')) {
+            return 'PSP'
+        }else if (platform.includes('PS Vita')) {
+            return 'PS Vita'
         }
+    }else{
+        return platform[0]
     }
-    return platforms
 }
 
-async function parsePage (html) {
-    let list = []
+function parsePage (html) {
+    let result = []
+    let stopParsing = false
     const $ = cheerio.load(html)
     // $().each doesn't work with await call?
     for ( let i = 0; i < $('.download-list-item').length; i++) {
         const element = $('.download-list-item').get(i)
         const type = $('.download-list-item__metadata', element).text()
         const title = $('.download-list-item__title', element).text().trim()
+        // Halt when encoutering a known title
+        if (!doParseAll && knownTitles.includes(title)) {
+            stopParsing = true
+            break
+        }
         // Only interested in games. It's impossible to filter every title, manual edit is still required.
         if (type.includes(appdata[locale].Game) && !includesIgnore(title, locale)) {
-            // In case of multiple platforms
-            let platforms = []
+            // In case of multiple Platform
+            let platform = []
             $('a', '.download-list-item__playable-on-info', element).each( (index, element) => {
-                platforms.push($(element).text())
+                platform.push($(element).text())
             })
-            // Some games are only downloadable on PS3, doesn't make sense to include
-            platforms = filterPS3(platforms)
-            console.log(`${title} ${platforms.join(', ')}`)
-            list.push({
+            // Only interested in the real playable platform
+            platform = filterPlatform(platform)
+            console.log(`${title} ${platform}`)
+            result.push({
                 'Title': title,
-                'platforms': platforms.join(', '),
+                'Platform': platform,
                 'Status': ''
             })
         }
     }
-    return list
+    return {
+        result: result,
+        stop: stopParsing
+    }
 }
 
 async function handler () {
