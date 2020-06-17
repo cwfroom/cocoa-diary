@@ -27,7 +27,7 @@ function checkCache (category) {
 
 function saveFile () {
     const filePath = getFilePath(fileCache['Category'])
-    fs.writeFileSync(filePath, JSON.stringify(fileCache))
+    fs.writeFileSync(filePath, JSON.stringify(fileCache, null, '\t'))
 }
 
 function updateEntry (changes) {

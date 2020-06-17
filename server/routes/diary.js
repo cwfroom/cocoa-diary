@@ -31,7 +31,7 @@ function openMonth (year, month, callback) {
             if (!fs.existsSync(yearPath)){
                 fs.mkdirSync(yearPath)
             }
-            fs.writeFile(getFilePath(year, month), JSON.stringify(newMonth), (err) => {
+            fs.writeFile(getFilePath(year, month), JSON.stringify(newMonth, null, '\t'), (err) => {
                 console.log('Failed to create new month file')
                 console.log(err)
             })
@@ -69,7 +69,7 @@ function updateList(file, changes, callback) {
     })
     
     const filePath = getFilePath(file['Year'], file['Month'])
-    fs.writeFile(filePath, JSON.stringify(file), (err) => {
+    fs.writeFile(filePath, JSON.stringify(file, null, '\t'), (err) => {
         if (err) {
             callback({'Result': 'Error', 'Timestamp': Date.now() / 1000})
         }
