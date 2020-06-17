@@ -244,9 +244,7 @@ class Logbook extends Component {
                     this.swapEntry('up')
                 }else if (event.key === 'ArrowDown') {
                     this.swapEntry('down')
-                }
-            }else {
-                if (event.key === 'Delete') {
+                }else if (event.key === 'd' || event.key === 'D') {
                     this.handleDelete()
                 }
             }
