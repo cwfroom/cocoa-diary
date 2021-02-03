@@ -38,7 +38,7 @@ class Logbook extends Component {
 
         this.state = {
             categories: [],
-            selectedIndex: 0,
+            selectedIndex: null,
             columns: [],
             list: [],
             openDialog: false,
@@ -51,14 +51,22 @@ class Logbook extends Component {
     componentDidMount = () => {
         document.addEventListener('keydown', this.hotKeys, false)
         this.logbookFetch('index', {}, (result) => {
-            this.setState({
-                categories: result
-            })
+            const prevIndex = sessionStorage.getItem('selectedIndex')
+            if (prevIndex === null) {
+                this.setState({
+                    categories: result
+                })
+            }else {
+                this.setState({
+                    categories: result,
+                    selectedIndex: prevIndex
+                })
+            }
         })
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.categories.length !== this.state.categories.length || prevState.selectedIndex !== this.state.selectedIndex) {
+        if (this.state.selectedIndex !== null && (prevState.categories.length !== this.state.categories.length || prevState.selectedIndex !== this.state.selectedIndex)) {
             const body = {
                 category: this.state.categories[this.state.selectedIndex],
                 selectedRow: null
@@ -85,6 +93,7 @@ class Logbook extends Component {
         this.setState(
             {selectedIndex: value}
         )
+        sessionStorage.setItem('selectedIndex', value)
     }
 
     handleTableCellClick = (value) => {
