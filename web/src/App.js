@@ -12,7 +12,7 @@ class App extends Component {
             <PrivateRoute exact path ='/' component={() => {return <Redirect to='diary'/>}}/>
             <Route exact path='/login' component={LoginPage}/>
             <PrivateRoute exact path='/diary' component={Diary}/>
-            <Route exact path='/logbook' component={Logbook}/>
+            <PrivateRoute exact path='/logbook' component={Logbook}/>
       </Router>
     )
   }
