@@ -1,0 +1,1 @@
+These scripts are deprecated since PSN store has been updated.
