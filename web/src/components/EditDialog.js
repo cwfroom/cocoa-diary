@@ -31,7 +31,7 @@ class EditDialog extends Component {
     render () {
         return (
             <div>
-            <Dialog open={this.props.openDialog} onClose={this.handleClose}>
+            <Dialog open={this.props.openDialog} onClose={this.handleClose} fullWidth={true} maxWidth='lg'>
                 <DialogTitle id="form-dialog-title">Edit Entry</DialogTitle>
                 <DialogContent>
                     {this.props.columns.map( (column, i) => 
