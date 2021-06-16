@@ -27,7 +27,8 @@ app.listen(port, () => {
 })
 
 const checkToken = exjwt({
-    secret: config['Secret']
+    secret: config['Secret'],
+    algorithms: ["HS256"]
 })
 
 // Routing

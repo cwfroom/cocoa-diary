@@ -16,7 +16,8 @@ function getFilePath (name) {
 }
 
 const checkToken = exjwt({
-    secret: config['Secret']
+    secret: config['Secret'],
+    algorithms: ["HS256"]
 })
 
 function checkCache (category) {
