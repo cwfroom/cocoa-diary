@@ -32,8 +32,10 @@ function openMonth (year, month, callback) {
                 fs.mkdirSync(yearPath)
             }
             fs.writeFile(getFilePath(year, month), JSON.stringify(newMonth, null, '\t'), (err) => {
-                console.log('Failed to create new month file')
-                console.log(err)
+                if (err) {
+                    console.log('Failed to create new month file')
+                    console.log(err)
+                }
             })
             callback('')
         }else{
