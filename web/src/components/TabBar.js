@@ -11,6 +11,7 @@ export default class TabBar extends Component{
             <Tabs value={window.location.pathname} style={{flex: 1}}>
                 <Tab component={Link} to='/diary' label='Diary' value='/diary'/>
                 <Tab component={Link} to='/logbook' label='Logbook' value='/logbook'/>
+                <Tab component={Link} to='/tools' label='Tools' value='/tools'/>
             </Tabs>
             <Button
                 color='inherit'
