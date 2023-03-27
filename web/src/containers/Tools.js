@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { Box, TextField, Button } from '@material-ui/core'
+import { Box, TextField, Button } from '@mui/material'
 import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
 
@@ -42,12 +41,11 @@ class Tools extends Component {
     }
 
     render () {
-        const {classes} = this.props
         return (
             <div>
                 <TabBar/>
                 <br />
-                <Box className={classes.paddedButton}>
+                <Box sx={styles.paddedButton}>
                     <Button
                         variant='contained'
                         color='primary'
@@ -56,7 +54,7 @@ class Tools extends Component {
                         Upload
                     </Button>
                 </Box>
-                <Box className={classes.paddedButton}>
+                <Box sx={styles.paddedButton}>
                     <Button
                         variant='contained'
                         color='primary'
@@ -71,4 +69,4 @@ class Tools extends Component {
     }
 }
 
-export default withStyles(styles)(Tools)
+export default Tools

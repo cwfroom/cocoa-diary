@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { Link } from 'react-router-dom'
-import { AppBar, Tabs, Tab, Button, Toolbar } from '@material-ui/core'
+import { AppBar, Tabs, Tab, Button, Toolbar } from '@mui/material'
 import {Auth} from '../services/auth'
 
 export default class TabBar extends Component{
@@ -8,7 +8,11 @@ export default class TabBar extends Component{
         return (
             <AppBar position='static'>
             <Toolbar variant='dense'>
-            <Tabs value={window.location.pathname} style={{flex: 1}}>
+            <Tabs value={window.location.pathname}
+                style={{flex: 1}}
+                textColor="inherit"
+                indicatorColor="secondary"
+            >
                 <Tab component={Link} to='/diary' label='Diary' value='/diary'/>
                 <Tab component={Link} to='/logbook' label='Logbook' value='/logbook'/>
                 <Tab component={Link} to='/tools' label='Tools' value='/tools'/>

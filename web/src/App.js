@@ -1,20 +1,30 @@
 import React, {Component} from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { PrivateRoute } from './components/PrivateRoute'
+import { Navigate, BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import Diary from './containers/Diary'
 import Logbook from './containers/Logbook'
 import Tools from './containers/Tools'
 import LoginPage from './containers/LoginPage'
-import { PrivateRoute } from './components/PrivateRoute'
 
 class App extends Component {
-  render () {
-    return (
-      <Router>
-            <PrivateRoute exact path ='/' component={() => {return <Redirect to='diary'/>}}/>
-            <Route exact path='/login' component={LoginPage}/>
-            <PrivateRoute exact path='/diary' component={Diary}/>
-            <PrivateRoute exact path='/logbook' component={Logbook}/>
-            <PrivateRoute exact path='/tools' component={Tools}/>
+    render () {
+        return (
+            <Router>
+                <Routes>
+                    <Route path='/login' element={<LoginPage/>}/>
+                    <Route path='/' element={<PrivateRoute/>}>
+                        <Route path='/' element={<Navigate to="/diary" />}/>
+                    </Route>
+                    <Route path='/diary' element={<PrivateRoute/>}>
+                        <Route path='/diary' element={<Diary/>}/>
+                    </Route>
+                    <Route path='/logbook' element={<PrivateRoute/>}>
+                        <Route path='/logbook' element={<Logbook/>}/>
+                    </Route>
+                    <Route path='/tools' element={<PrivateRoute/>}>
+                        <Route path='/tools' element={<Tools/>}/>
+                    </Route>
+                </Routes>
       </Router>
     )
   }

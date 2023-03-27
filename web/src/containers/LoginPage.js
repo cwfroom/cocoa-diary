@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Box, Paper, TextField } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { Box, Paper, TextField } from '@mui/material'
 import { Auth } from '../services/auth'
+import { Navigate } from 'react-router-dom'
 
 const styles = {
     loginRoot: {
@@ -36,10 +36,7 @@ class LoginPage extends Component {
         if (event.key === 'Enter') {
             Auth.login(this.state.password)
             .then( status => {
-                if (status === 0) {
-                    this.props.history.replace('/diary')
-                    window.location.reload()
-                }else {
+                if (status !== 0) {
                     this.setState({
                         isError: true
                     })
@@ -49,15 +46,17 @@ class LoginPage extends Component {
     }
 
     render () {
-        const {classes} = this.props
         return (
-            <Paper className={classes.loginRoot}>
-                <Box className={classes.formContainer}>
+            <Paper sx={styles.loginRoot}>
+                {Auth.isLoggedIn() && (
+                    <Navigate to="/" replace={true} />
+                )}
+                <Box sx={styles.formContainer}>
                     <TextField
                         fullWidth
                         autoFocus
                         error={this.state.isError}
-                        className={classes.centerElement}
+                        sx={styles.centerElement}
                         variant='outlined'
                         type='password'
                         label='Password'
@@ -71,4 +70,4 @@ class LoginPage extends Component {
     }
 }
 
-export default withStyles(styles)(LoginPage)
+export default LoginPage

@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import { Button, Menu, MenuItem } from '@mui/material';
 
+/*
 const StyledMenu = withStyles({
   paper: {
     border: '1px solid #d3d4d5',
@@ -23,6 +21,7 @@ const StyledMenu = withStyles({
     {...props}
   />
 ));
+*/
 
 class DropdownMenu extends Component {
 
@@ -71,7 +70,7 @@ class DropdownMenu extends Component {
             >
               {this.props.selectedValue}
             </Button>
-            <StyledMenu
+            <Menu
               id="dropdown-menu"
               anchorEl={this.state.anchorEl}
               keepMounted
@@ -81,7 +80,7 @@ class DropdownMenu extends Component {
                 {items.map( (item, i) => 
                   <MenuItem key={i} onClick={this.handleItemClick.bind(this, {item})}>{item}</MenuItem>
                 )}
-            </StyledMenu>
+            </Menu>
           </div>
         )
     }

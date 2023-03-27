@@ -10,6 +10,7 @@ async function login (password) {
     const result = await res.json()
     if (result.status === 0) {
         localStorage.setItem('token', result.token);
+        window.location.replace('/')
     }
         return result.status
     }

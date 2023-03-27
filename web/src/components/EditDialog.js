@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {Button, TextField} from '@material-ui/core'
-import {Dialog, DialogActions, DialogContent, DialogTitle} from '@material-ui/core'
+import {Button, TextField} from '@mui/material'
+import {Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material'
 
 class EditDialog extends Component {
     constructor (props) {

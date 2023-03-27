@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { Box, List, ListItem } from '@material-ui/core'
-import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
+import { Box, List, ListItemButton } from '@mui/material'
+import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
 import EditDialog from '../components/EditDialog'
 import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
@@ -280,27 +279,26 @@ class Logbook extends Component {
     }
 
     render () {
-        const {classes} = this.props
         return (
             <div>
                 <TabBar/>
                 <br />
-                <Box className={classes.leftPanel}>
-                    <List className={classes.categoryList}>
+                <Box sx={styles.leftPanel}>
+                    <List sx={styles.categoryList}>
                     {this.state.categories.map( (category, i) => 
-                        <ListItem
+                        <ListItemButton
                             button
                             selected = {this.state.selectedIndex === i}
                             key={i}
                             onClick={this.handleCategoryListClick.bind(this, i)}
                         >
                             {category}
-                        </ListItem>
+                        </ListItemButton>
                     )}
                     </List>
                 </Box>
 
-                <Box className={classes.rightPanel}>
+                <Box sx={styles.rightPanel}>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -335,7 +333,7 @@ class Logbook extends Component {
                         <br />
                 </Box>
 
-                <Box className={classes.statusLabel}>
+                <Box sx={styles.statusLabel}>
                     {Auth.isLoggedIn() && this.state.statusMessage}
                 </Box>
 
@@ -357,4 +355,4 @@ class Logbook extends Component {
     }
 }
 
-export default withStyles(styles)(Logbook)
+export default Logbook

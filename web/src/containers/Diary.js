@@ -1,8 +1,7 @@
 import React, {Component} from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { Box, TextField, List, ListItem, Button } from '@material-ui/core'
+import { Box, TextField, List, Button, ListItemButton } from '@mui/material'
 import DropdownMenu from '../components/DropdownMenu'
-import { setTimeout, clearTimeout } from 'timers'
+import { setTimeout, clearTimeout } from 'timers-browserify'
 import { Auth } from '../services/auth'
 import TabBar from '../components/TabBar'
 import moment from 'moment'
@@ -266,13 +265,12 @@ class Diary extends Component {
     }
 
     render () {
-        const {classes} = this.props
         return (
-            <div className={classes.diaryRoot}>
+            <div sx={styles.diaryRoot}>
                 <TabBar/>
                 <br />
-                <Box className={classes.leftPanel}>
-                    <Box className = {classes.inlineBox}>
+                <Box sx={styles.leftPanel}>
+                    <Box sx = {styles.inlineBox}>
                         <DropdownMenu 
                             startValue={this.state.currentYear}
                             endValue={this.state.firstYear}
@@ -280,7 +278,7 @@ class Diary extends Component {
                             setFunc = {this.setSelectedYear}
                         ></DropdownMenu>
                     </Box>
-                    <Box className = {classes.inlineBox}>
+                    <Box sx = {styles.inlineBox}>
                         <DropdownMenu
                             startValue= {1}
                             endValue= {12}
@@ -288,51 +286,49 @@ class Diary extends Component {
                             setFunc = {this.setSelectedMonth}
                         ></DropdownMenu>
                     </Box>
-                <List className={classes.entryList}>
+                <List sx={styles.entryList}>
                     {this.state.entryList.map( (entry, i) => 
-                        <ListItem
-                            button
+                        <ListItemButton
                             selected = {this.state.selectedIndex === i}
                             key={i}
                             onClick={this.handleEntryListClick.bind(this, i)}
                         >
                             { (entry['Day'] !== 0) ? '[' + this.twoDigits(this.state.selectedYear % 100) + this.twoDigits(this.state.selectedMonth) + 
                             this.twoDigits(entry['Day']) + '] ' + entry['Title'] : entry['Title']}
-                        </ListItem>
+                        </ListItemButton>
                     )}
-                    <ListItem
-                        button
+                    <ListItemButton
                         onClick={this.createEntry}
                     >
                         New...
-                    </ListItem>
+                    </ListItemButton>
                 </List>
                 </Box>
 
-                <Box className={classes.rightPanel}>
+                <Box sx={styles.rightPanel}>
                         <TextField
                             disabled
-                            className={classes.narrowTextField}
+                            sx={styles.narrowTextField}
                             id='year-textfield'
                             variant='outlined'
                             value={this.twoDigits(this.state.selectedYear % 100)}
                         />
                         <TextField
                             disabled
-                            className={classes.narrowTextField}
+                            sx={styles.narrowTextField}
                             id='month-textfield'
                             variant='outlined'
                             value={this.twoDigits(this.state.selectedMonth)}
                         />
                         <TextField
-                            className={classes.narrowTextField}
+                            sx={styles.narrowTextField}
                             id='day-textfield'
                             variant='outlined'
                             value={this.state.entryList[this.state.selectedIndex] ? this.twoDigits(this.state.entryList[this.state.selectedIndex]['Day']): '00'}
                             onChange={this.handleTextFieldUpdate('Day')}
                         />
                         <TextField
-                            className={classes.titleTextField}
+                            sx={styles.titleTextField}
                             id='title-textfield'
                             variant='outlined'
                             value={this.state.entryList[this.state.selectedIndex] ? this.state.entryList[this.state.selectedIndex]['Title'] : ''}
@@ -342,19 +338,19 @@ class Diary extends Component {
                         <TextField
                             multiline
                             rows={this.state.windowHeight / 30}
-                            className={classes.contentTextField}
+                            sx={styles.contentTextField}
                             id='content-textfield'
                             variant='outlined'
                             value={this.state.currentContent ? this.state.currentContent : ''}
                             onChange={this.handleTextFieldUpdate('Content')}
                         />
                         <br />
-                        <Box className={classes.wordCountLabel}>
+                        <Box sx={styles.wordCountLabel}>
                             Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
                             <br />
                             {this.state.statusMessage}
                         </Box>
-                        <Box className={classes.saveButton}>
+                        <Box sx={styles.saveButton}>
                             <Button
                                 variant='contained'
                                 color="primary"
@@ -370,4 +366,4 @@ class Diary extends Component {
     }
 }
 
-export default withStyles(styles)(Diary)
+export default Diary
