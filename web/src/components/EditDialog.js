@@ -2,6 +2,12 @@ import React, {Component} from 'react'
 import {Button, TextField} from '@mui/material'
 import {Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material'
 
+const styles = {
+    propTextfield : {
+        margin : '10px 0 10px'
+    }
+}
+
 class EditDialog extends Component {
     constructor (props) {
         super (props)
@@ -42,6 +48,7 @@ class EditDialog extends Component {
                             value={(this.props.row && this.props.row[column]) ? this.props.row[column] : ''}
                             onChange={this.handleTextFieldUpdate(column)}
                             onKeyDown={this.handlePressCtrlEnter}
+                            sx = {styles.propTextfield}
                         />
                     )}
                     {this.props.enableComments &&
@@ -53,6 +60,7 @@ class EditDialog extends Component {
                             value={(this.props.row && this.props.row['Comments']) ? this.props.row['Comments'] : ''}
                             onChange={this.handleTextFieldUpdate('Comments')}
                             onKeyDown={this.handlePressCtrlEnter}
+                            sx = {styles.propTextfield}
                         />
                     }
                 </DialogContent>
