@@ -1,24 +1,18 @@
 'use strict'
 // Node modules
-const express = require('express')
-const router = express.Router()
-const path = require('path')
-const fs = require('fs')
-const exjwt = require('express-jwt')
+import express from 'express';
+const router = express.Router();
+import path from 'path';
+import fs from 'fs';
 
 // Read config file, caching is fine
-const config = require('../config.json')
+import config from '../config.js'
 
 let fileCache = {}
 
 function getFilePath (name) {
-    return path.join(config['DataPath'], 'logbook', name + '.zzd')
+    return path.join(config.data['DataPath'], 'logbook', name + '.zzd')
 }
-
-const checkToken = exjwt({
-    secret: config['Secret'],
-    algorithms: ["HS256"]
-})
 
 function checkCache (category) {
     if (fileCache['Category'] !== category){
@@ -70,7 +64,7 @@ function sendResult(res, success) {
 }
 
 router.post('/index', (req, res) => {
-    const fileIndex = fs.readFileSync(path.join(config['DataPath'], 'logbook', 'index.zzd'), 'utf-8')
+    const fileIndex = fs.readFileSync(path.join(config.data['DataPath'], 'logbook', 'index.zzd'), 'utf-8')
     res.send(fileIndex)
 })
 
@@ -94,19 +88,19 @@ function generalHandler (req, res, handler, key) {
     }
 }
 
-router.post('/submit', checkToken, (req, res) => {
+router.post('/submit', (req, res) => {
     generalHandler(req, res, updateEntry, 'changes')
 })
 
-router.post('/delete', checkToken, (req, res) => {
+router.post('/delete', (req, res) => {
     generalHandler(req, res, deleteEntry, 'index')
 })
 
-router.post('/insert', checkToken, (req, res) => {
+router.post('/insert', (req, res) => {
     generalHandler(req, res, insertEntry, 'index')
 })
 
-router.post('/swap', checkToken, (req, res) => {
+router.post('/swap', (req, res) => {
     generalHandler(req, res, swapEntry, 'index')
 })
 
@@ -118,4 +112,4 @@ router.post('/reload', (req, res) => {
 })
 
 
-module.exports = router
+export default router

@@ -1,12 +1,12 @@
 'use strict'
 // Node modules
-const express = require('express')
-const router = express.Router()
-const path = require('path')
-const fs = require('fs')
+import express from 'express';
+const router = express.Router();
+import path from 'path';
+import fs from 'fs';
 
 // Read config file, caching is fine
-const config = require('../config.json')
+import config from '../config.js'
 
 let fileCache = {}
 
@@ -15,7 +15,7 @@ function twoDigits (value) {
 }
 
 function getFilePath (year, month) {
-    return path.join(config['DataPath'], year.toString(), twoDigits(month) + '.zzd')
+    return path.join(config.data['DataPath'], year.toString(), twoDigits(month) + '.zzd')
 }
 
 function openMonth (year, month, callback) {
@@ -27,7 +27,7 @@ function openMonth (year, month, callback) {
                 Month: month,
                 List: []
             }
-            const yearPath = path.join(config['DataPath'], year.toString())
+            const yearPath = path.join(config.data['DataPath'], year.toString())
             if (!fs.existsSync(yearPath)){
                 fs.mkdirSync(yearPath)
             }
@@ -80,7 +80,7 @@ function updateList(file, changes, callback) {
 }
 
 router.post('/firstyear', (req, res) => {
-    res.send({'FirstYear': config['FirstYear']})
+    res.send({'FirstYear': config.data['FirstYear']})
 })
 
 router.post('/month', (req, res) => {
@@ -134,4 +134,4 @@ router.post('/submit', (req, res) => {
 })
 
 
-module.exports = router
+export default router

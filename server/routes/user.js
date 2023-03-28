@@ -1,12 +1,12 @@
 'use strict'
 // Node modules
-const express = require('express')
-const router = express.Router()
-const jwt = require('jsonwebtoken')
-const sha256 = require('js-sha256')
+import express from 'express';
+const router = express.Router();
+import jwt from 'jsonwebtoken';
+import sha256 from 'js-sha256';
 
 // Read config file, caching is fine
-const config = require('../config.json')
+import config from '../config.js'
 
 router.post('/login', (req, res) => {
     const { password } = req.body
@@ -27,4 +27,4 @@ router.post('/login', (req, res) => {
     }
 })
 
-module.exports = router
+export default router

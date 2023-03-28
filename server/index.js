@@ -1,20 +1,16 @@
 'use strict'
 // Node modules
-const path = require('path')
-const fs = require('fs')
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const exjwt = require('express-jwt')
-
+import express from 'express'
+import cors from 'cors'
+import { expressjwt } from 'express-jwt'
+import bodyParser from 'body-parser'
 // Custom modules
-const diary = require('./routes/diary')
-const logbook = require('./routes/logbook')
-const user = require('./routes/user')
-const tools = require('./routes/tools')
-
+import diary from './routes/diary.js';
+import logbook from './routes/logbook.js';
+import user from './routes/user.js';
+import tools from './routes/tools.js';
 // Read config file, caching is fine
-const config = require('./config.json')
+import config from './config.js'
 
 const app = express()
 const port = 2638
@@ -23,12 +19,12 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
 app.listen(port, () => {
-    console.log(`Data path: ${config['DataPath']}`)
+    console.log(`Data path: ${config.data['DataPath']}`)
     console.log(`Listening on port ${port}`)
 })
 
-const checkToken = exjwt({
-    secret: config['Secret'],
+const checkToken = expressjwt({
+    secret: config.data['Secret'],
     algorithms: ["HS256"]
 })
 
