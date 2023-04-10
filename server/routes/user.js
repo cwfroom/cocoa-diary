@@ -10,11 +10,11 @@ import config from '../config.js'
 
 router.post('/login', (req, res) => {
     const { password } = req.body
-    if (sha256(password) === config['Password']){
+    if (sha256(password) === config.data['Password']){
         const token = jwt.sign({
             username: 'admin'
         },
-        config['Secret'],
+        config.data['Secret'],
         {
             expiresIn: '7d'
         })
