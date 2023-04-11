@@ -31,7 +31,6 @@ const styles = {
     }
 }
 
-
 class Logbook extends Component {
     constructor (props) {
         super(props)
@@ -98,12 +97,29 @@ class Logbook extends Component {
     }
 
     handleTableCellClick = (value) => {
+        let selectedEntry = this.state.list[this.state.entryIndex]
         if (value === this.state.entryIndex) {
-            // Fetch notes here
-            this.setState({
-                activeEntry: this.state.list[this.state.entryIndex],
-                editMode: true
-            })
+            if (selectedEntry['Alias']) {
+                const body = {
+                    'category' : this.state.categories[this.state.categoryIndex],
+                    'alias' : selectedEntry['Alias']
+                }
+                this.logbookFetch('notes', body, (result) => {
+                    if (result['Notes'] !== undefined) {
+                        this.setState({
+                            activeEntry: update(selectedEntry, {'Notes': {$set : result['Notes']}}),
+                            editMode: true
+                        })
+                    }else{
+                        console.log(result)
+                    }
+                })
+            }else{
+                this.setState({
+                    activeEntry: selectedEntry,
+                    editMode: true
+                })
+            }
         }else {
             this.setState({
                 entryIndex: value
@@ -269,6 +285,17 @@ class Logbook extends Component {
         }
     }
 
+    handleNotesButtonClick = (event) => {
+        const alias = this.state.activeEntry['Title'].replace(/[<>:"/\\|?*\s]/g, "").slice(0, 20)
+        this.setState({
+            activeEntry: update(this.state.activeEntry, { 
+                'Alias': {$set: alias},
+                'Notes': {$set: ''}
+                }
+            )
+        })
+    }
+
     render () {
         return (
             <div>
@@ -331,6 +358,27 @@ class Logbook extends Component {
                                     />
                                 </ListItem>
                             )}
+                            {this.state.activeEntry['Alias'] && 
+                                <ListItem key = {'listitem-Alias'}>
+                                    <TextField
+                                        label = 'Alias'
+                                        value = {this.state.activeEntry['Alias']}
+                                        onChange = {this.handleEntryEdit('Alias')}
+                                        fullWidth
+                                    />
+                                </ListItem>
+                            }
+                            {this.state.activeEntry['Alias'] && 
+                                <ListItem key = {'listitem-Notes'}>
+                                    <TextField
+                                        label = 'Notes'
+                                        value = {this.state.activeEntry['Notes']}
+                                        onChange= {this.handleEntryEdit('Notes')}
+                                        fullWidth
+                                        multiline
+                                    />
+                                </ListItem>
+                            }
                             <ListItem>
                                 <ButtonGroup>
                                     <Button
@@ -346,6 +394,14 @@ class Logbook extends Component {
                                         onClick={this.handleSaveButtonClick(false)}
                                     >
                                         Cancel
+                                    </Button>
+                                    <Button
+                                        variant = 'outlined'
+                                        color = 'primary'
+                                        onClick={this.handleNotesButtonClick}
+                                        disabled = {this.state.activeEntry['Alias'] !== undefined}
+                                    >
+                                        Notes
                                     </Button>
                                     <Button
                                         variant='outlined'

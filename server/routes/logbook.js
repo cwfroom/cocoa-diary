@@ -15,7 +15,7 @@ function getFilePath (name) {
 }
 
 function getNotesPath (alias) {
-    return path.json(config.data['DataPath', 'logbook', fileCache['Category'], alias + '.json'])
+    return path.join(config.data['DataPath'], 'logbook', fileCache['Category'], alias + '.json')
 }
 
 function checkCache (category) {
@@ -52,9 +52,10 @@ function updateEntry (changes) {
             updateNotes(list[index]['Alias'], changes['Notes'])
     }
     fileCache['List'] = list
+    return 'Updated Index ' + index
 }
 
-function getNotes (alias) {
+function readNotes (alias) {
     const notesPath = getNotesPath(alias)
     const notesObj = JSON.parse(fs.readFileSync(notesPath, {encoding: 'utf-8'}))
     return notesObj
@@ -70,24 +71,28 @@ function updateNotes (alias, notes) {
 }
 
 function deleteEntry (index) {
+    if (fileCache['List'][index]['Alias']) {
+        const notespath = getNotesPath(fileCache['List'][index]['Alias'])
+        fs.unlinkSync(notespath)
+    }
     fileCache['List'].splice(index, 1)
+    return 'Deleted Index ' + index
 }
 
 function insertEntry (index) {
     fileCache['List'].splice(index, 0, {})
-    const notespath = getNotesPath(fileCache['List'][index]['Alias'])
-    fs.unlinkSync(notespath)
 }
 
 function swapEntry (index) {
     let temp = fileCache['List'][index[0]]
     fileCache['List'][index[0]] = fileCache['List'][index[1]]
     fileCache['List'][index[1]] = temp
- }
+    return `Swapped Index ${index[0]} and ${index[1]}` 
+}
 
-function sendResult(res, success) {
+function sendResult(res, success, message) {
     if (success) {
-        res.send({'Result': 'Saved', 'Timestamp': Date.now() / 1000})
+        res.send({'Result': message, 'Timestamp': Date.now() / 1000})
     }else{
         res.send({'Result': 'Error', 'Timestamp': Date.now() / 1000})
     }
@@ -109,12 +114,12 @@ function generalHandler (req, res, handler, key) {
     const data = req.body[key]
     try {
         checkCache(category)
-        handler(data)
+        const message = handler(data)
         saveFile()
-        sendResult(res, true)
+        sendResult(res, true, message)
     } catch (err) {
         console.log(err)
-        sendResult(res, false)
+        sendResult(res, false, '')
     }
 }
 
@@ -135,9 +140,10 @@ router.post('/swap', (req, res) => {
 })
 
 router.post('/notes', (req, res) => {
-    const alias = req.body['Alias']
+    const { category, alias } = req.body
+    checkCache(category)
     try {
-        const notesObj = getNotes(alias)
+        const notesObj = readNotes(alias)
         res.send(notesObj)
     }catch(err) {
         console.log(err)
