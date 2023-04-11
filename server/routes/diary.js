@@ -15,7 +15,7 @@ function twoDigits (value) {
 }
 
 function getFilePath (year, month) {
-    return path.join(config.data['DataPath'], year.toString(), twoDigits(month) + '.zzd')
+    return path.join(config.data['DataPath'], 'Diary', year.toString(), twoDigits(month) + '.json')
 }
 
 function openMonth (year, month, callback) {
@@ -27,7 +27,7 @@ function openMonth (year, month, callback) {
                 Month: month,
                 List: []
             }
-            const yearPath = path.join(config.data['DataPath'], year.toString())
+            const yearPath = path.join(config.data['DataPath'], 'Diary', year.toString())
             if (!fs.existsSync(yearPath)){
                 fs.mkdirSync(yearPath)
             }

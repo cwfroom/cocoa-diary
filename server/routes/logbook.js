@@ -11,11 +11,11 @@ import config from '../config.js'
 let fileCache = {}
 
 function getFilePath (name) {
-    return path.join(config.data['DataPath'], 'logbook', name + '.json')
+    return path.join(config.data['DataPath'], 'Logbook', name + '.json')
 }
 
 function getNotesPath (alias) {
-    return path.join(config.data['DataPath'], 'logbook', fileCache['Category'], alias + '.json')
+    return path.join(config.data['DataPath'], 'Logbook', fileCache['Category'], alias + '.json')
 }
 
 function checkCache (category) {
@@ -99,7 +99,7 @@ function sendResult(res, success, message) {
 }
 
 router.post('/index', (req, res) => {
-    const fileIndex = fs.readFileSync(path.join(config.data['DataPath'], 'logbook', 'index.json'), 'utf-8')
+    const fileIndex = fs.readFileSync(path.join(config.data['DataPath'], 'Logbook', 'index.json'), 'utf-8')
     res.send(fileIndex)
 })
 
