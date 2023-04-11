@@ -11,7 +11,11 @@ import config from '../config.js'
 let fileCache = {}
 
 function getFilePath (name) {
-    return path.join(config.data['DataPath'], 'logbook', name + '.zzd')
+    return path.join(config.data['DataPath'], 'logbook', name + '.json')
+}
+
+function getNotesPath (alias) {
+    return path.json(config.data['DataPath', 'logbook', fileCache['Category'], alias + '.json'])
 }
 
 function checkCache (category) {
@@ -35,10 +39,34 @@ function updateEntry (changes) {
                 list[index][key] = changes[key]
             }
     })
-    if (changes['Comments']) {
-        list[index]['Comments'] = changes['Comments']
+    // Handle notes change
+    if (changes['Notes']) {
+        // Alias change
+        if (changes['Alias']) {
+            // Rename file if exists
+            if (list[index]['Alias'] && fs.existsSync(getNotesPath(list[index]['Alias']))) {
+                fs.renameSync(getNotesPath(list[index]['Alias']), getNotesPath(changes['Alias']))
+            }
+            list[index]['Alias'] = changes['Alias']
+        }
+            updateNotes(list[index]['Alias'], changes['Notes'])
     }
     fileCache['List'] = list
+}
+
+function getNotes (alias) {
+    const notesPath = getNotesPath(alias)
+    const notesObj = JSON.parse(fs.readFileSync(notesPath, {encoding: 'utf-8'}))
+    return notesObj
+}
+
+function updateNotes (alias, notes) {
+    const notesPath = getNotesPath(alias)
+    const notesObj = {
+        'Alias': alias,
+        'Notes': notes
+    }
+    fs.writeFileSync(notesPath, JSON.stringify(notesObj, null, '\t'))
 }
 
 function deleteEntry (index) {
@@ -47,6 +75,8 @@ function deleteEntry (index) {
 
 function insertEntry (index) {
     fileCache['List'].splice(index, 0, {})
+    const notespath = getNotesPath(fileCache['List'][index]['Alias'])
+    fs.unlinkSync(notespath)
 }
 
 function swapEntry (index) {
@@ -64,7 +94,7 @@ function sendResult(res, success) {
 }
 
 router.post('/index', (req, res) => {
-    const fileIndex = fs.readFileSync(path.join(config.data['DataPath'], 'logbook', 'index.zzd'), 'utf-8')
+    const fileIndex = fs.readFileSync(path.join(config.data['DataPath'], 'logbook', 'index.json'), 'utf-8')
     res.send(fileIndex)
 })
 
@@ -102,6 +132,17 @@ router.post('/insert', (req, res) => {
 
 router.post('/swap', (req, res) => {
     generalHandler(req, res, swapEntry, 'index')
+})
+
+router.post('/notes', (req, res) => {
+    const alias = req.body['Alias']
+    try {
+        const notesObj = getNotes(alias)
+        res.send(notesObj)
+    }catch(err) {
+        console.log(err)
+        res.send(err)
+    }
 })
 
 // Force reload, mainly for debug purpose

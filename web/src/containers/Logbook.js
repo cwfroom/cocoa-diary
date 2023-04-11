@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
-import { Box, List, ListItemButton } from '@mui/material'
+import { Box, List, ListItem, ListItemButton, TextField } from '@mui/material'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
-import EditDialog from '../components/EditDialog'
+import { Button, ButtonGroup } from '@mui/material'
 import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
 import moment from 'moment'
+import update from 'immutability-helper'
 
 const styles = {
     leftPanel: {
@@ -37,12 +38,12 @@ class Logbook extends Component {
 
         this.state = {
             categories: [],
-            selectedIndex: null,
+            categoryIndex: null,
             columns: [],
             list: [],
-            openDialog: false,
-            selectedRow: null,
-            pendingChanges: {},
+            editMode: false,
+            entryIndex: null,
+            activeEntry: null,
             statusMessage: ''
         }
     }
@@ -50,7 +51,7 @@ class Logbook extends Component {
     componentDidMount = () => {
         document.addEventListener('keydown', this.hotKeys, false)
         this.logbookFetch('index', {}, (result) => {
-            const prevIndex = sessionStorage.getItem('selectedIndex')
+            const prevIndex = sessionStorage.getItem('categoryIndex')
             if (prevIndex === null) {
                 this.setState({
                     categories: result
@@ -58,17 +59,18 @@ class Logbook extends Component {
             }else {
                 this.setState({
                     categories: result,
-                    selectedIndex: prevIndex
+                    categoryIndex: prevIndex
                 })
             }
         })
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (this.state.selectedIndex !== null && (prevState.categories.length !== this.state.categories.length || prevState.selectedIndex !== this.state.selectedIndex)) {
+        if (this.state.categoryIndex !== null && 
+            (prevState.categories.length !== this.state.categories.length || prevState.categoryIndex !== this.state.categoryIndex)
+        ) {
             const body = {
-                category: this.state.categories[this.state.selectedIndex],
-                selectedRow: null
+                category: this.state.categories[this.state.categoryIndex]
             }
             this.logbookFetch('category', body, (result) => {
                 this.setState({
@@ -90,74 +92,36 @@ class Logbook extends Component {
 
     handleCategoryListClick = (value) => {
         this.setState(
-            {selectedIndex: value}
+            {categoryIndex: value}
         )
-        sessionStorage.setItem('selectedIndex', value)
+        sessionStorage.setItem('categoryIndex', value)
     }
 
     handleTableCellClick = (value) => {
-        if (Auth.isLoggedIn()) {
-            if (value === this.state.selectedRow) {
-                this.setState({
-                    selectedRow: value,
-                    openDialog: true
-                })
-            }else {
-                this.setState({
-                    selectedRow: value
-                })
-            }
-        }
-    }
-
-    getRealIndex = () => {
-        if (this.state.selectedRow === null) {
-            return null
+        if (value === this.state.entryIndex) {
+            // Fetch notes here
+            this.setState({
+                activeEntry: this.state.list[this.state.entryIndex],
+                editMode: true
+            })
         }else {
-            return this.state.list.length - this.state.selectedRow - 1
-        }
-    }
-
-    handleRowUpdate = (key, value) => {
-        this.setState( (state) => {
-            let listCopy = [...state.list]
-            let pendingChangesCopy = state.pendingChanges
-            const realIndex = state.list.length - state.selectedRow - 1
-            if (!pendingChangesCopy['Index']) {
-                pendingChangesCopy['Index'] = realIndex
-            }
-            listCopy[state.selectedRow][key] = value
-            pendingChangesCopy[key] = value
-            return {
-                ...state,
-                list: listCopy,
-                pendingChanges: pendingChangesCopy
-            }
-        })
-    }
-
-    submitChanges = () => {
-        if (Object.entries(this.state.pendingChanges).length !== 0){
-            const body = {
-                'category': this.state.categories[this.state.selectedIndex],
-                'changes': this.state.pendingChanges
-            }
-            this.logbookFetch('submit', body, (result) => {
-                this.setState({
-                    statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
-                })
-                if (result['Result'] !== 'Error') {
-                    this.setState(
-                        {pendingChanges: {}}
-                    )
-                }
+            this.setState({
+                entryIndex: value
             })
         }
     }
 
-    submitEdit = (action, index) => {
+    getRealIndex = () => {
+        if (this.state.entryIndex === null) {
+            return null
+        }else {
+            return this.state.list.length - this.state.entryIndex - 1
+        }
+    }
+
+    submitListEdit = (action, index) => {
         const body = {
-            'category': this.state.categories[this.state.selectedIndex],
+            'category': this.state.categories[this.state.categoryIndex],
             'index': index
         }
         this.logbookFetch(action, body, (result) => {
@@ -170,13 +134,13 @@ class Logbook extends Component {
     handleDelete = () => {
         let realIndex = this.getRealIndex()
         if (realIndex !== null) {
-            this.submitEdit('delete', realIndex)
+            this.submitListEdit('delete', realIndex)
             this.setState( (state) => {
             let listCopy = [...state.list]
-            listCopy.splice(this.state.selectedRow, 1)
+            listCopy.splice(this.state.entryIndex, 1)
             return {
                 ...state,
-                openDialog: false,
+                editMode: false,
                 list: listCopy
             }
         })
@@ -184,27 +148,28 @@ class Logbook extends Component {
     }
 
     handleInsert = () => {
-        this.submitEdit('insert', this.getRealIndex())
+        this.submitListEdit('insert', this.getRealIndex())
         this.setState( (state) => {
             let listCopy = [...state.list]
-            listCopy.splice(this.state.selectedRow + 1, 0, {})
+            listCopy.splice(this.state.entryIndex + 1, 0, {})
             return {
                 ...state,
-                openDialog: false,
+                editMode: false,
                 list: listCopy
             }
         })
     }
 
     createEntry = () => {
-        this.setState( (state) => {
-            const modified = [{}, ...state.list]
-            return {
-                ...state,
-                list: modified,
-                selectedRow: 0,
-                openDialog: true
-            }
+        let newEntry = {}
+        for (let i = 0; i < this.state.columns.length; i++) {
+            newEntry[this.state.columns[i]] = ''
+        }
+        this.setState({
+            entryIndex: 0,
+            list: update(this.state.list, {$unshift: [newEntry]}),
+            activeEntry: newEntry,
+            editMode: true
         })
     }
 
@@ -213,13 +178,13 @@ class Logbook extends Component {
         if (realIndex !== null) {
             if (direction === 'up') {
                 if (realIndex < this.state.list.length) {
-                    this.submitEdit('swap', [realIndex, realIndex + 1])
-                    this.localSwap(this.state.selectedRow, this.state.selectedRow - 1)
+                    this.submitListEdit('swap', [realIndex, realIndex + 1])
+                    this.localSwap(this.state.entryIndex, this.state.entryIndex - 1)
                 }
             }else if (direction === 'down'){
                 if (realIndex > 0) {
-                    this.submitEdit('swap', [realIndex, realIndex - 1])
-                    this.localSwap(this.state.selectedRow, this.state.selectedRow + 1)
+                    this.submitListEdit('swap', [realIndex, realIndex - 1])
+                    this.localSwap(this.state.entryIndex, this.state.entryIndex + 1)
                 }
             }
         }
@@ -234,18 +199,16 @@ class Logbook extends Component {
             return {
                 ...state,
                 list: listCopy,
-                selectedRow: other
+                entryIndex: other
             }
         })
     }
 
     hotKeys = (event) => {
-        if (Auth.isLoggedIn()) {
+        if (!this.state.editMode) {
             if (event.ctrlKey && event.altKey) {
                 if (event.key === 'n' || event.key === 'N') {
                     this.createEntry()
-                }else if (event.key === 's' || event.key === 'S') {
-                    this.submitChanges()
                 }else if (event.key === 'r' || event.key === 'R') {
                     this.forceReload()
                 }else if (event.key === 'ArrowUp') {
@@ -261,7 +224,7 @@ class Logbook extends Component {
 
     forceReload = () => {
         const body = {
-            category: this.state.categories[this.state.selectedIndex]
+            category: this.state.categories[this.state.categoryIndex]
         }
         this.logbookFetch('reload', body, (result) => {
             this.setState({
@@ -271,11 +234,39 @@ class Logbook extends Component {
         })
     }
 
-    closeDialog = () => {
+    handleEntryEdit = (column) => (event) => {
         this.setState({
-            openDialog: false
+            activeEntry : update(this.state.activeEntry, {[column]: {$set: event.target.value}})
         })
-        this.submitChanges()
+    }
+
+    submitEntryEdit () {
+        const body = {
+            'category': this.state.categories[this.state.categoryIndex],
+            'changes': update(this.state.activeEntry, {'Index': {$set: this.getRealIndex()}})
+        }
+        this.logbookFetch('submit', body, (result) => {
+            this.setState({
+                statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
+            })
+            if (result['Result'] !== 'Error') {
+                this.setState(
+                    {activeEntry: null}
+                )
+            }
+        })
+        this.setState({
+            list: update(this.state.list, {[this.state.entryIndex]: {$set: this.state.activeEntry}})
+        })
+    }
+
+    handleSaveButtonClick = (doSave) => (event) => {
+        this.setState({
+            editMode: false
+        })
+        if (doSave) {
+            this.submitEntryEdit()
+        }
     }
 
     render () {
@@ -287,8 +278,7 @@ class Logbook extends Component {
                     <List sx={styles.categoryList}>
                     {this.state.categories.map( (category, i) => 
                         <ListItemButton
-                            button
-                            selected = {this.state.selectedIndex === i}
+                            selected = {this.state.categoryIndex === i}
                             key={i}
                             onClick={this.handleCategoryListClick.bind(this, i)}
                         >
@@ -299,6 +289,7 @@ class Logbook extends Component {
                 </Box>
 
                 <Box sx={styles.rightPanel}>
+                    {!this.state.editMode ? 
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -309,15 +300,13 @@ class Logbook extends Component {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {Auth.isLoggedIn() && 
                             <TableRow>
                                 <TableCell onClick={this.createEntry}>New...</TableCell>
                             </TableRow>
-                            }
                             {this.state.list.map( (entry, i) => 
                                 <TableRow
                                     key={'row-'+i}
-                                    selected={this.state.selectedRow === i}
+                                    selected={this.state.entryIndex === i}
                                 >
                                     {this.state.columns.map( (column) => 
                                         <TableCell
@@ -330,26 +319,50 @@ class Logbook extends Component {
                             )}
                             </TableBody>
                         </Table>
+                        :
+                        <List>
+                            {this.state.columns.map( (column) => 
+                                <ListItem key = {'listitem-'+column}>
+                                    <TextField
+                                        label = {column}
+                                        value = {this.state.activeEntry[column]}
+                                        onChange = {this.handleEntryEdit(column)}
+                                        fullWidth
+                                    />
+                                </ListItem>
+                            )}
+                            <ListItem>
+                                <ButtonGroup>
+                                    <Button
+                                        variant = 'outlined'
+                                        color = 'error'
+                                        onClick={this.handleDelete}
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button
+                                        variant = 'outlined'
+                                        color = 'primary'
+                                        onClick={this.handleSaveButtonClick(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant='outlined'
+                                        color="primary"
+                                        onClick={this.handleSaveButtonClick(true)}
+                                    >
+                                        Save
+                                    </Button>
+                                </ButtonGroup>
+                            </ListItem>
+                        </List>}
                         <br />
                 </Box>
 
                 <Box sx={styles.statusLabel}>
-                    {Auth.isLoggedIn() && this.state.statusMessage}
+                    {this.state.statusMessage}
                 </Box>
-
-                {Auth.isLoggedIn() &&
-                <EditDialog
-                    openDialog={this.state.openDialog}
-                    closeDialog={this.closeDialog}
-                    columns={this.state.columns}
-                    row={this.state.list[this.state.selectedRow]}
-                    handleRowUpdate={this.handleRowUpdate}
-                    handleDelete={this.handleDelete}
-                    handleInsert={this.handleInsert}
-                    enableComments={true}
-                />
-                }
-
             </div>
         )
     }
