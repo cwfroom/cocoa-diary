@@ -3,13 +3,13 @@
   npm install -g node-windows
   npm link node-windows
 */
-var Service = require('node-windows').Service;
+import { Service } from 'node-windows'
 
 // Create a new service object
 var svc = new Service({
   name:'Cocoa Diary',
   description: 'Cocoa Diary',
-  script: 'C:\\diary-server\\index.js',
+  script: 'C:\\cocoa-diary\\server\\index.js',
   nodeOptions: [
     '--harmony',
     '--max_old_space_size=4096'
