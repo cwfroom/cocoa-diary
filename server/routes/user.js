@@ -14,10 +14,7 @@ router.post('/login', (req, res) => {
         const token = jwt.sign({
             username: 'admin'
         },
-        config.data['Secret'],
-        {
-            expiresIn: '7d'
-        })
+        config.data['Secret'])
         res.json({
             status: 0,
             token
