@@ -35,9 +35,10 @@ function openMonth (year, month, callback) {
                 if (err) {
                     console.log('Failed to create new month file')
                     console.log(err)
+                } else {
+                    openMonth(year, month, callback)
                 }
             })
-            callback('')
         }else{
             fileCache = JSON.parse(content)
             callback(fileCache)
