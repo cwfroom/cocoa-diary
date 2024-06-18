@@ -5,6 +5,7 @@ import Diary from './containers/Diary'
 import Logbook from './containers/Logbook'
 import Tools from './containers/Tools'
 import LoginPage from './containers/LoginPage'
+import SearchPage from './containers/SearchPage'
 
 class App extends Component {
     render () {
@@ -23,6 +24,9 @@ class App extends Component {
                     </Route>
                     <Route path='/tools' element={<PrivateRoute/>}>
                         <Route path='/tools' element={<Tools/>}/>
+                    </Route>
+                    <Route path='/search' element={<PrivateRoute/>}>
+                        <Route path='/search' element={<SearchPage/>}/>
                     </Route>
                 </Routes>
       </Router>
