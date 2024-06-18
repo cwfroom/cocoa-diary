@@ -51,6 +51,12 @@ class SearchPage extends Component {
         this.executeSearch()
     }
 
+    handlePressEnter = (event) => {
+        if (event.key === 'Enter') {
+            this.executeSearch()
+        }
+    }
+
     onClickClearButton = (event) => {
         this.setState({
             keyword: '',
@@ -69,6 +75,7 @@ class SearchPage extends Component {
                         id='keyword-textfield'
                         value={this.state.keyword}
                         onChange={this.handleTextfieldChange}
+                        onKeyDown={this.handlePressEnter}
                         size='small'
                         sx={styles.keywordTextField}
                     />
