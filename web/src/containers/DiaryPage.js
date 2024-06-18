@@ -51,7 +51,7 @@ const styles = {
     }
 }
 
-class Diary extends Component {
+class DiaryPage extends Component {
 
     constructor (props) {
         super(props)
@@ -366,4 +366,4 @@ class Diary extends Component {
     }
 }
 
-export default Diary
+export default DiaryPage
