@@ -41,6 +41,7 @@ class Logbook extends Component {
             columns: [],
             list: [],
             editMode: false,
+            toggleProps: false,
             entryIndex: null,
             activeEntry: null,
             statusMessage: ''
@@ -285,7 +286,7 @@ class Logbook extends Component {
         }
     }
 
-    handleNotesButtonClick = (event) => {
+    handleAddNotesButtonClick = (event) => {
         const alias = this.state.activeEntry['Title'].replace(/[<>:"/\\|?*\s]/g, "").slice(0, 20)
         this.setState({
             activeEntry: update(this.state.activeEntry, { 
@@ -293,6 +294,12 @@ class Logbook extends Component {
                 'Notes': {$set: ''}
                 }
             )
+        })
+    }
+
+    handleTooglePropsButtonClick = (event) => {
+        this.setState({
+            toggleProps: !this.state.toggleProps
         })
     }
 
@@ -348,7 +355,17 @@ class Logbook extends Component {
                         </Table>
                         :
                         <List>
-                            {this.state.columns.map( (column) => 
+                            {this.state.toggleProps ? 
+                            <ListItem key='listitem-Title'>
+                                <TextField
+                                    label = 'Title'
+                                    value = {this.state.activeEntry['Title']}
+                                    onChange = {this.handleEntryEdit('Title')}
+                                    fullWidth
+                                />
+                            </ListItem>
+                            :
+                            this.state.columns.map( (column) =>
                                 <ListItem key = {'listitem-'+column}>
                                     <TextField
                                         label = {column}
@@ -398,10 +415,18 @@ class Logbook extends Component {
                                     <Button
                                         variant = 'outlined'
                                         color = 'primary'
-                                        onClick={this.handleNotesButtonClick}
+                                        onClick={this.handleAddNotesButtonClick}
                                         disabled = {this.state.activeEntry['Alias'] !== undefined}
                                     >
-                                        Notes
+                                        Add Notes
+                                    </Button>
+                                    <Button
+                                        variant = 'outlined'
+                                        color = 'primary'
+                                        onClick={this.handleTooglePropsButtonClick}
+                                        disabled = {this.state.activeEntry['Alias'] === undefined}
+                                    >
+                                        Toogle Props
                                     </Button>
                                     <Button
                                         variant='outlined'
