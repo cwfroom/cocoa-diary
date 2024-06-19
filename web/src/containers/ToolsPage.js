@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
-import { Box, TextField, Button } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import TabBar from '../components/TabBar'
 import { Auth } from '../services/auth'
+import moment from 'moment'
 
 const styles = {
     paddedButton: {
@@ -20,18 +21,26 @@ class Tools extends Component {
     }
 
     toolsFetch = (route, body, callback) => {
-        Auth.authedFetch('tools/'+route, body)
+        Auth.authedFetch('tools/'+route, body, true)
         .then(result => {
             if (result) callback(result)
         })
     }
 
-    uploadClick = () => {
-        this.toolsFetch('upload', {}, this.updateStatus)
+    downloadClick = () => {
+        this.toolsFetch('download', {}, this.handleDownload)
     }
 
-    downloadClick = () => {
-        this.toolsFetch('download', {}, this.updateStatus)
+    handleDownload = (result) => {
+        const href = window.URL.createObjectURL(result)
+        const link = document.createElement('a')
+        link.href = href
+        const date = new Date()
+        const formattedDate = moment(date).format('YYMMDD')
+        link.setAttribute('download', `Backup${formattedDate}.zip`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
     }
 
     updateStatus = (text) => {
@@ -45,15 +54,6 @@ class Tools extends Component {
             <div>
                 <TabBar/>
                 <br />
-                <Box sx={styles.paddedButton}>
-                    <Button
-                        variant='contained'
-                        color='primary'
-                        onClick={this.uploadClick}
-                    >
-                        Upload
-                    </Button>
-                </Box>
                 <Box sx={styles.paddedButton}>
                     <Button
                         variant='contained'

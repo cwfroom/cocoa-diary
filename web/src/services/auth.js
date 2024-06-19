@@ -30,7 +30,7 @@ function isTokenExpired (token) {
     return (decoded.exp < Date.now() / 1000)
 }
 
-async function authedFetch (route, body) {
+async function authedFetch (route, body, isDownload = false) {
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -44,7 +44,11 @@ async function authedFetch (route, body) {
         if (res.status !== 200){
             return null
         }else {
-            return res.json()
+            if (isDownload) {
+                return res.blob()
+            }else{
+                return res.json()
+            }
         }
     })
 }
