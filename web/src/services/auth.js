@@ -1,5 +1,5 @@
 import { globals } from './globals'
-import decode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 async function login (password) {
     const res = await fetch(`${globals.apiURL}/user/login`, {
@@ -26,7 +26,7 @@ function isLoggedIn () {
 }
 
 function isTokenExpired (token) {
-    const decoded = decode(token)
+    const decoded = jwtDecode(token)
     return (decoded.exp < Date.now() / 1000)
 }
 
