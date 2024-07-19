@@ -18,8 +18,8 @@ const styles = {
         padding: '0'
     },
     rightPanel: {
-        marginLeft: '260px',
-        maxWidth: 'calc(100% - 260px)',
+        marginLeft: '210px',
+        maxWidth: 'calc(100% - 210px)',
         paddingRight: '10px'
     },
     inlineBox: {
@@ -323,6 +323,7 @@ class DiaryPage extends Component {
                         <TextEditor
                             text = {this.state.currentContent}
                             onChange = {this.handleTextFieldUpdate('Content')}
+                            referenceHeight = {0}
                         />
                         <br />
                         <Box sx={styles.statusLabel}>
