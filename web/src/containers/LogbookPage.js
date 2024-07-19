@@ -1,9 +1,8 @@
 import React, {Component} from 'react'
-import { Box, List, ListItem, ListItemButton, TextField } from '@mui/material'
+import { Box, List, ListItemButton } from '@mui/material'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
-import { Button, ButtonGroup } from '@mui/material'
 import TabBar from '../components/TabBar'
-import TextEditor from '../components/TextEditor'
+import LogbookItemEditor from '../components/LogbookItemEditor'
 import { Auth } from '../services/auth'
 import moment from 'moment'
 import update from 'immutability-helper'
@@ -42,7 +41,6 @@ class Logbook extends Component {
             columns: [],
             list: [],
             editMode: false,
-            toggleProps: false,
             entryIndex: null,
             activeEntry: null,
             statusMessage: ''
@@ -301,12 +299,6 @@ class Logbook extends Component {
         })
     }
 
-    handleTooglePropsButtonClick = (event) => {
-        this.setState({
-            toggleProps: !this.state.toggleProps
-        })
-    }
-
     render () {
         return (
             <div>
@@ -358,88 +350,14 @@ class Logbook extends Component {
                             </TableBody>
                         </Table>
                         :
-                        <List>
-                            {this.state.toggleProps ? 
-                            <ListItem key='listitem-Title'>
-                                <TextField
-                                    label = 'Title'
-                                    value = {this.state.activeEntry['Title']}
-                                    onChange = {this.handleEntryEdit('Title')}
-                                    fullWidth
-                                />
-                            </ListItem>
-                            :
-                            this.state.columns.map( (column) =>
-                                <ListItem key = {'listitem-'+column}>
-                                    <TextField
-                                        label = {column}
-                                        value = {this.state.activeEntry[column]}
-                                        onChange = {this.handleEntryEdit(column)}
-                                        fullWidth
-                                    />
-                                </ListItem>
-                            )}
-                            {this.state.activeEntry['Alias'] && 
-                                <ListItem key = {'listitem-Alias'}>
-                                    <TextField
-                                        label = 'Alias'
-                                        value = {this.state.activeEntry['Alias']}
-                                        onChange = {this.handleEntryEdit('Alias')}
-                                        fullWidth
-                                    />
-                                </ListItem>
-                            }
-                            {this.state.activeEntry['Alias'] && 
-                                <ListItem key = {'listitem-Notes'}>
-                                    <TextEditor
-                                        text = {this.state.activeEntry['Notes']}
-                                        onChange = {this.handleEntryEdit('Notes')}
-                                    />
-                                </ListItem>
-                            }
-                            <ListItem>
-                                <ButtonGroup>
-                                    <Button
-                                        variant = 'outlined'
-                                        color = 'error'
-                                        onClick={this.handleDelete}
-                                    >
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        variant = 'outlined'
-                                        color = 'primary'
-                                        onClick={this.handleSaveButtonClick(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        variant = 'outlined'
-                                        color = 'primary'
-                                        onClick={this.handleAddNotesButtonClick}
-                                        disabled = {this.state.activeEntry['Alias'] !== undefined}
-                                    >
-                                        Add Notes
-                                    </Button>
-                                    <Button
-                                        variant = 'outlined'
-                                        color = 'primary'
-                                        onClick={this.handleTooglePropsButtonClick}
-                                        disabled = {this.state.activeEntry['Alias'] === undefined}
-                                    >
-                                        Toogle Props
-                                    </Button>
-                                    <Button
-                                        variant='outlined'
-                                        color="primary"
-                                        onClick={this.handleSaveButtonClick(true)}
-                                    >
-                                        Save
-                                    </Button>
-                                </ButtonGroup>
-                            </ListItem>
-                        </List>}
-                        <br />
+                        <LogbookItemEditor
+                            columns = {this.state.columns}
+                            activeEntry = {this.state.activeEntry}
+                            handleEntryEdit = {this.handleEntryEdit}
+                            handleSaveButtonClick = {this.handleSaveButtonClick}
+                            handleAddNotesButtonClick = {this.handleAddNotesButtonClick}
+                            handleDeleteButtonClick = {this.handleDelete}
+                        />}
                 </Box>
 
                 <Box sx={styles.statusLabel}>

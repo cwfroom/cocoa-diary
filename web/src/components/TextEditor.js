@@ -19,7 +19,7 @@ class TextEditor extends Component {
         Required props
         text
         onChange
-        elementsForLinesCalc
+        referenceHeight
     */
     constructor (props) {
         super(props)
@@ -52,7 +52,7 @@ class TextEditor extends Component {
                     <TextField
                         multiline
                         fullWidth
-                        rows={this.state.windowHeight / 30}
+                        rows={(this.state.windowHeight - this.props.referenceHeight)/ 32}
                         sx={styles.contentTextField}
                         id='content-textfield'
                         variant='outlined'
