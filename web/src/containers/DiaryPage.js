@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import { Box, TextField, List, Button, ListItemButton } from '@mui/material'
 import DropdownMenu from '../components/DropdownMenu'
+import TextEditor from '../components/TextEditor'
 import { setTimeout, clearTimeout } from 'timers-browserify'
 import { Auth } from '../services/auth'
 import TabBar from '../components/TabBar'
@@ -37,13 +38,7 @@ const styles = {
     titleTextField: {
         width: 'calc(100% - 135px)'
     },
-    contentTextField: {
-        width: '100%',
-        minHeight: '100%',
-        fontFamily: '"Microsoft YaHei UI", "Roboto"',
-        fontSize: '36px'
-    },
-    wordCountLabel: {
+    statusLabel: {
         float: 'left'
     },
     saveButton: {
@@ -58,7 +53,6 @@ class DiaryPage extends Component {
         const d = new Date()
         
         this.state = {
-            windowHeight: 0,
             firstYear: d.getFullYear(),
             currentYear: d.getFullYear(),
             selectedYear: d.getFullYear(),
@@ -72,8 +66,6 @@ class DiaryPage extends Component {
     }
 
     componentDidMount = () => {
-        this.updateWindowHeight()
-        window.addEventListener('resize', this.updateWindowHeight)
         document.addEventListener('keydown', this.hotKeys, false)
         this.autoSaveTimer = this.autoSave()
 
@@ -84,12 +76,6 @@ class DiaryPage extends Component {
         })
 
         this.fetchMonth(true)
-    }
-
-    updateWindowHeight = () => {
-        this.setState(
-            {windowHeight: window.innerHeight}
-        )
     }
 
     componentDidUpdate = (prevProps, prevState) => {
@@ -110,7 +96,6 @@ class DiaryPage extends Component {
     }
 
     componentWillUnmount = () => {
-        window.removeEventListener('resize', this.updateWindowHeight)
         document.removeEventListener('keydown', this.hotKeys)
     }
 
@@ -335,19 +320,12 @@ class DiaryPage extends Component {
                             onChange={this.handleTextFieldUpdate('Title')}
                         />
                         <br />
-                        <TextField
-                            multiline
-                            rows={this.state.windowHeight / 30}
-                            sx={styles.contentTextField}
-                            id='content-textfield'
-                            variant='outlined'
-                            value={this.state.currentContent ? this.state.currentContent : ''}
-                            onChange={this.handleTextFieldUpdate('Content')}
+                        <TextEditor
+                            text = {this.state.currentContent}
+                            onChange = {this.handleTextFieldUpdate('Content')}
                         />
                         <br />
-                        <Box sx={styles.wordCountLabel}>
-                            Word Count: {this.state.currentContent ? this.state.currentContent.length : 0}
-                            <br />
+                        <Box sx={styles.statusLabel}>
                             {this.state.statusMessage}
                         </Box>
                         <Box sx={styles.saveButton}>
@@ -358,7 +336,7 @@ class DiaryPage extends Component {
                                 disabled={Object.keys(this.state.pendingChanges).length === 0}
                             >
                                 Save
-                            </Button>
+                        </Button>
                         </Box>
                 </Box>
             </div>
