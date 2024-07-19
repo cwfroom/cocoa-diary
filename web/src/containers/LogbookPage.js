@@ -74,7 +74,7 @@ class Logbook extends Component {
             this.logbookFetch('category', body, (result) => {
                 this.setState({
                     columns: result['Columns'],
-                    list: result['List'].reverse()
+                    list: result['List']
                 })
             })
         }
@@ -130,14 +130,6 @@ class Logbook extends Component {
         }
     }
 
-    getRealIndex = () => {
-        if (this.state.entryIndex === null) {
-            return null
-        }else {
-            return this.state.list.length - this.state.entryIndex - 1
-        }
-    }
-
     submitListEdit = (action, index) => {
         const body = {
             'category': this.state.categories[this.state.categoryIndex],
@@ -151,9 +143,8 @@ class Logbook extends Component {
     }
 
     handleDelete = () => {
-        let realIndex = this.getRealIndex()
-        if (realIndex !== null) {
-            this.submitListEdit('delete', realIndex)
+        if (this.state.entryIndex !== null) {
+            this.submitListEdit('delete', this.state.entryIndex)
             this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.entryIndex, 1)
@@ -167,7 +158,7 @@ class Logbook extends Component {
     }
 
     handleInsert = () => {
-        this.submitListEdit('insert', this.getRealIndex())
+        this.submitListEdit('insert', this.state.entryIndex)
         this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.entryIndex + 1, 0, {})
@@ -193,16 +184,15 @@ class Logbook extends Component {
     }
 
     swapEntry = (direction) => {
-        const realIndex = this.getRealIndex()
-        if (realIndex !== null) {
+        if (this.state.entryIndex !== null) {
             if (direction === 'up') {
-                if (realIndex < this.state.list.length) {
-                    this.submitListEdit('swap', [realIndex, realIndex + 1])
+                if (this.state.entryIndex < this.state.list.length) {
+                    this.submitListEdit('swap', [this.state.entryIndex, this.state.entryIndex - 1])
                     this.localSwap(this.state.entryIndex, this.state.entryIndex - 1)
                 }
             }else if (direction === 'down'){
-                if (realIndex > 0) {
-                    this.submitListEdit('swap', [realIndex, realIndex - 1])
+                if (this.state.entryIndex >= 0) {
+                    this.submitListEdit('swap', [this.state.entryIndex, this.state.entryIndex + 1])
                     this.localSwap(this.state.entryIndex, this.state.entryIndex + 1)
                 }
             }
@@ -248,7 +238,7 @@ class Logbook extends Component {
         this.logbookFetch('reload', body, (result) => {
             this.setState({
                 columns: result['Columns'],
-                list: result['List'].reverse()
+                list: result['List']
             })
         })
     }
@@ -262,7 +252,7 @@ class Logbook extends Component {
     submitEntryEdit () {
         const body = {
             'category': this.state.categories[this.state.categoryIndex],
-            'changes': update(this.state.activeEntry, {'Index': {$set: this.getRealIndex()}})
+            'changes': update(this.state.activeEntry, {'Index': {$set: this.state.entryIndex}})
         }
         this.logbookFetch('submit', body, (result) => {
             this.setState({
