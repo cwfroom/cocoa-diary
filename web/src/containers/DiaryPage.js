@@ -12,14 +12,13 @@ const styles = {
         maxHeight: '100vh'
     },
     leftPanel: {
-        maxWidth: '250px',
+        maxWidth: '240px',
+        paddingRight: '10px',
         float: 'left',
-        marginRight: '10px',
-        padding: '0'
     },
     rightPanel: {
-        marginLeft: '210px',
-        maxWidth: 'calc(100% - 210px)',
+        float: 'left',
+        minWidth: 'calc(100% - 260px)',
         paddingRight: '10px'
     },
     inlineBox: {
