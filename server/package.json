@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "nodemonConfig": {
+    "ignore": ["data"]
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
