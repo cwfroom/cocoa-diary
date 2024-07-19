@@ -3,8 +3,6 @@ import { Box, TextField } from '@mui/material'
 
 const styles = {
     contentTextField: {
-        width: '100%',
-        minHeight: '100%',
         fontFamily: '"Microsoft YaHei UI", "Roboto"',
         fontSize: '36px'
     },
@@ -47,10 +45,13 @@ class TextEditor extends Component {
 
     render () {
         return (
-            <div>
+            <Box 
+                sx = {{'width': '100%'}}
+            >
                 <Box>
                     <TextField
                         multiline
+                        fullWidth
                         rows={this.state.windowHeight / 30}
                         sx={styles.contentTextField}
                         id='content-textfield'
@@ -62,7 +63,7 @@ class TextEditor extends Component {
                 <Box sx={styles.wordCountLabel}>
                     Word Count: {this.props.text ? this.props.text.length : 0}
                 </Box>
-            </div>
+            </Box>
         )
     }
 }

@@ -3,6 +3,7 @@ import { Box, List, ListItem, ListItemButton, TextField } from '@mui/material'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
 import { Button, ButtonGroup } from '@mui/material'
 import TabBar from '../components/TabBar'
+import TextEditor from '../components/TextEditor'
 import { Auth } from '../services/auth'
 import moment from 'moment'
 import update from 'immutability-helper'
@@ -92,7 +93,10 @@ class Logbook extends Component {
 
     handleCategoryListClick = (value) => {
         this.setState(
-            {categoryIndex: value}
+            {
+                categoryIndex: value,
+                editMode: false
+            }
         )
         sessionStorage.setItem('categoryIndex', value)
     }
@@ -387,12 +391,9 @@ class Logbook extends Component {
                             }
                             {this.state.activeEntry['Alias'] && 
                                 <ListItem key = {'listitem-Notes'}>
-                                    <TextField
-                                        label = 'Notes'
-                                        value = {this.state.activeEntry['Notes']}
-                                        onChange= {this.handleEntryEdit('Notes')}
-                                        fullWidth
-                                        multiline
+                                    <TextEditor
+                                        text = {this.state.activeEntry['Notes']}
+                                        onChange = {this.handleEntryEdit('Notes')}
                                     />
                                 </ListItem>
                             }
