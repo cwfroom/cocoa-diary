@@ -1,21 +1,21 @@
 import React, {Component} from 'react'
 import { Box, ButtonGroup, List, ListItem, Button, TextField } from '@mui/material'
 import TextEditor from './TextEditor'
+import update from 'immutability-helper'
 
 class LogbookItemEditor extends Component {
     /*
         Required props
         columns
         activeEntry
-        handleEntryEdit
-        handleSaveButtonClick
-        handleAddNotesButtonClick
-        handleDeleteButtonClick
+        liftState
+        handleDelete
     */
 
     constructor (props) {
         super(props)
         this.state = {
+            entry: this.props.activeEntry,
             toggleProps : false,
             listHeight : 0
         }
@@ -43,6 +43,23 @@ class LogbookItemEditor extends Component {
         }, this.updateListHeight)
     }
 
+    handleEntryEdit = (column) => (event) => {
+        this.setState({
+            entry : update(this.state.entry, {[column]: {$set: event.target.value}})
+        })
+    }
+
+    handleAddNotesButtonClick = (event) => {
+        const alias = this.state.entry['Title'].replace(/[<>:"/\\|?*\s]/g, "").slice(0, 20)
+        this.setState({
+            entry: update(this.state.entry, { 
+                'Alias': {$set: alias},
+                'Notes': {$set: ''}
+                }
+            )
+        })
+    }
+
     render () {
         return (
             <Box>
@@ -52,39 +69,39 @@ class LogbookItemEditor extends Component {
                             <Button
                                 variant = 'outlined'
                                 color = 'primary'
-                                onClick={this.props.handleSaveButtonClick(false)}
+                                onClick={this.props.liftState(null, true)}
                             >
-                                Cancel
+                                Back
+                            </Button>
+                            <Button
+                                variant='outlined'
+                                color="primary"
+                                onClick={this.props.liftState(this.state.entry, true)}
+                            >
+                                Save
                             </Button>
                             <Button
                                 variant = 'outlined'
                                 color = 'primary'
                                 onClick={this.handleTooglePropsButtonClick}
-                                disabled = {this.props.activeEntry['Alias'] === undefined}
+                                disabled = {this.state.entry['Alias'] === undefined}
                             >
                                 Toogle Props
                             </Button>
                             <Button
                                 variant = 'outlined'
                                 color = 'primary'
-                                onClick={this.props.handleAddNotesButtonClick}
-                                disabled = {this.props.activeEntry['Alias'] !== undefined}
+                                onClick={this.handleAddNotesButtonClick}
+                                disabled = {this.state.entry['Alias'] !== undefined}
                             >
                                 Add Notes
                             </Button>
                             <Button
                                 variant = 'outlined'
                                 color = 'error'
-                                onClick={this.props.handleDeleteButtonClick}
+                                onClick={this.props.handleDelete}
                             >
                                 Delete
-                            </Button>
-                            <Button
-                                variant='outlined'
-                                color="primary"
-                                onClick={this.props.handleSaveButtonClick(true)}
-                            >
-                                Save
                             </Button>
                         </ButtonGroup>
                     </ListItem>
@@ -95,8 +112,8 @@ class LogbookItemEditor extends Component {
                     >
                         <TextField
                             label = 'Title'
-                            value = {this.props.activeEntry['Title']}
-                            onChange = {this.props.handleEntryEdit('Title')}
+                            value = {this.state.entry['Title']}
+                            onChange = {this.handleEntryEdit('Title')}
                             fullWidth
                         />
                     </ListItem>
@@ -108,27 +125,27 @@ class LogbookItemEditor extends Component {
                         >
                             <TextField
                                 label = {column}
-                                value = {this.props.activeEntry[column]}
-                                onChange = {this.props.handleEntryEdit(column)}
+                                value = {this.state.entry[column]}
+                                onChange = {this.handleEntryEdit(column)}
                                 fullWidth
                             />
                         </ListItem>
                     )}
-                    {this.props.activeEntry['Alias'] && 
+                    {this.state.entry['Alias'] && 
                         <ListItem key = {'listitem-Alias'}>
                             <TextField
                                 label = 'Alias'
-                                value = {this.props.activeEntry['Alias']}
-                                onChange = {this.props.handleEntryEdit('Alias')}
+                                value = {this.state.entry['Alias']}
+                                onChange = {this.handleEntryEdit('Alias')}
                                 fullWidth
                             />
                         </ListItem>
                     }
-                    {this.props.activeEntry['Alias'] && 
+                    {this.state.entry['Alias'] && 
                         <ListItem>
                             <TextEditor
-                                text = {this.props.activeEntry['Notes']}
-                                onChange = {this.props.handleEntryEdit('Notes')}
+                                text = {this.state.entry['Notes']}
+                                onChange = {this.handleEntryEdit('Notes')}
                                 referenceHeight = {this.state.listHeight}
                             />
                         </ListItem>

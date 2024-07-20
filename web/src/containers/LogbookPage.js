@@ -269,24 +269,17 @@ class Logbook extends Component {
         })
     }
 
-    handleSaveButtonClick = (doSave) => (event) => {
-        this.setState({
-            editMode: false
-        })
-        if (doSave) {
-            this.submitEntryEdit()
-        }
-    }
 
-    handleAddNotesButtonClick = (event) => {
-        const alias = this.state.activeEntry['Title'].replace(/[<>:"/\\|?*\s]/g, "").slice(0, 20)
+
+    handleApplyEdits = (entry, quitEditorMode = false) => (event) => {
         this.setState({
-            activeEntry: update(this.state.activeEntry, { 
-                'Alias': {$set: alias},
-                'Notes': {$set: ''}
-                }
-            )
+            editMode: !quitEditorMode
         })
+        if (entry !== null) {
+            this.setState({
+                activeEntry: entry
+            }, this.submitEntryEdit)
+        }
     }
 
     render () {
@@ -343,10 +336,8 @@ class Logbook extends Component {
                         <LogbookItemEditor
                             columns = {this.state.columns}
                             activeEntry = {this.state.activeEntry}
-                            handleEntryEdit = {this.handleEntryEdit}
-                            handleSaveButtonClick = {this.handleSaveButtonClick}
-                            handleAddNotesButtonClick = {this.handleAddNotesButtonClick}
-                            handleDeleteButtonClick = {this.handleDelete}
+                            liftState = {this.handleApplyEdits}
+                            handleDelete = {this.handleDelete}
                         />}
                 </Box>
 
