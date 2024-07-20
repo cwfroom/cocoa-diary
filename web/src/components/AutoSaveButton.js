@@ -11,6 +11,11 @@ const styles = {
 class AutoSaveButton extends Component {
     componentDidMount = () => {
         this.autoSaveTimer = this.autoSave()
+        document.addEventListener('keydown', this.hotKey, false)
+    }
+
+    componentWillUnmount = () => {
+        document.removeEventListener('keydown', this.hotKey)
     }
 
     autoSave = () => {
@@ -21,6 +26,14 @@ class AutoSaveButton extends Component {
         clearTimeout(this.autoSaveTimer)
         this.autoSaveTimer = this.autoSave()
         this.props.onSave()
+    }
+
+    hotKey = (event) => {
+        if (event.ctrlKey && event.shiftKey) {
+            if (event.key === 's' || event.key === 'S') {
+                this.onSave()
+            }
+        }
     }
 
     render () {
