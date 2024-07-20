@@ -309,7 +309,10 @@ class Logbook extends Component {
                 <Box sx={styles.rightPanel}>
                     {!this.state.editMode ? 
                         <Box sx={styles.tableContainer}>
-                            <Table>
+                            <Table
+                                size='small'
+                                stickyHeader
+                            >
                                 <TableHead>
                                     <TableRow>
                                     {this.state.columns.map( (column, i) => 
