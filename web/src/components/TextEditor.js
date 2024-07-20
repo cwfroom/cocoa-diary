@@ -8,9 +8,6 @@ const styles = {
     },
     wordCountLabel: {
         float: 'left'
-    },
-    buttons: {
-        float: 'right'
     }
 }
 
