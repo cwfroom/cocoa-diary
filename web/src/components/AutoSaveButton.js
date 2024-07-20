@@ -9,13 +9,25 @@ const styles = {
 }
 
 class AutoSaveButton extends Component {
+    /*
+        Required props
+        onSave
+        buttonDisabled
+    */
+
     componentDidMount = () => {
-        this.autoSaveTimer = this.autoSave()
         document.addEventListener('keydown', this.hotKey, false)
     }
 
     componentWillUnmount = () => {
         document.removeEventListener('keydown', this.hotKey)
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // Start timer when there are pending edits
+        if (prevProps.buttonDisabled && !this.props.buttonDisabled) {
+            this.autoSaveTimer = this.autoSave()
+        }
     }
 
     autoSave = () => {
@@ -24,7 +36,6 @@ class AutoSaveButton extends Component {
 
     onSave = (event) => {
         clearTimeout(this.autoSaveTimer)
-        this.autoSaveTimer = this.autoSave()
         this.props.onSave()
     }
 

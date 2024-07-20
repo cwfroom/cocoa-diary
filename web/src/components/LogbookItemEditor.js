@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import { Box, ButtonGroup, List, ListItem, Button, TextField } from '@mui/material'
 import TextEditor from './TextEditor'
+import AutoSaveButton from './AutoSaveButton'
 import update from 'immutability-helper'
 
 class LogbookItemEditor extends Component {
@@ -17,7 +18,8 @@ class LogbookItemEditor extends Component {
         this.state = {
             entry: this.props.activeEntry,
             toggleProps : false,
-            listHeight : 0
+            listHeight : 0,
+            havePendingChanges : false
         }
     }
 
@@ -45,7 +47,8 @@ class LogbookItemEditor extends Component {
 
     handleEntryEdit = (column) => (event) => {
         this.setState({
-            entry : update(this.state.entry, {[column]: {$set: event.target.value}})
+            entry : update(this.state.entry, {[column]: {$set: event.target.value}}),
+            havePendingChanges: true
         })
     }
 
@@ -60,6 +63,17 @@ class LogbookItemEditor extends Component {
         })
     }
 
+    liftState = (applyEdits = false, quitEditMode = false) => {
+        let entry = null
+        if (applyEdits) {
+            entry = this.state.entry
+            this.setState({
+                havePendingChanges : false
+            })
+        }
+        this.props.liftState(entry, quitEditMode)
+    }
+
     render () {
         return (
             <Box>
@@ -69,14 +83,14 @@ class LogbookItemEditor extends Component {
                             <Button
                                 variant = 'outlined'
                                 color = 'primary'
-                                onClick={this.props.liftState(null, true)}
+                                onClick={() => (this.liftState(false, true))}
                             >
                                 Back
                             </Button>
                             <Button
                                 variant='outlined'
                                 color="primary"
-                                onClick={this.props.liftState(this.state.entry, true)}
+                                onClick={() => (this.liftState(true, true))}
                             >
                                 Save
                             </Button>
@@ -142,7 +156,7 @@ class LogbookItemEditor extends Component {
                         </ListItem>
                     }
                     {this.state.entry['Alias'] && 
-                        <ListItem>
+                        <ListItem> 
                             <TextEditor
                                 text = {this.state.entry['Notes']}
                                 onChange = {this.handleEntryEdit('Notes')}
@@ -151,6 +165,14 @@ class LogbookItemEditor extends Component {
                         </ListItem>
                     }
                     </List>
+                    <Box
+                        sx = {{'marginRight': '10px'}}
+                    >
+                        <AutoSaveButton
+                                onSave = {() => {this.liftState(true, false)}}
+                                buttonDisabled = {!this.state.havePendingChanges}
+                        />
+                    </Box>
             </Box>
         )
     }

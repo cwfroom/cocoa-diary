@@ -271,10 +271,12 @@ class Logbook extends Component {
 
 
 
-    handleApplyEdits = (entry, quitEditorMode = false) => (event) => {
-        this.setState({
-            editMode: !quitEditorMode
-        })
+    handleApplyEdits = (entry, quitEditMode = false) => {
+        if (quitEditMode) {
+            this.setState({
+                editMode: false
+            })
+        }
         if (entry !== null) {
             this.setState({
                 activeEntry: entry
