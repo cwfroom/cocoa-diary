@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Box, TextField, List, Button, ListItemButton } from '@mui/material'
 import DropdownMenu from '../components/DropdownMenu'
 import TextEditor from '../components/TextEditor'
-import { setTimeout, clearTimeout } from 'timers-browserify'
+import AutoSaveButton from '../components/AutoSaveButton'
 import { Auth } from '../services/auth'
 import TabBar from '../components/TabBar'
 import moment from 'moment'
@@ -39,9 +39,6 @@ const styles = {
     },
     statusLabel: {
         float: 'left'
-    },
-    saveButton: {
-        float: 'right'
     }
 }
 
@@ -66,7 +63,6 @@ class DiaryPage extends Component {
 
     componentDidMount = () => {
         document.addEventListener('keydown', this.hotKeys, false)
-        this.autoSaveTimer = this.autoSave()
 
         this.diaryFetch('firstyear', {}, (result) => {
             this.setState({
@@ -178,8 +174,6 @@ class DiaryPage extends Component {
             }
             )
         }
-        clearTimeout(this.autoSaveTimer)
-        this.autoSaveTimer = this.autoSave()
         this.updateChanges(name, event.target.value)
     }
 
@@ -242,10 +236,6 @@ class DiaryPage extends Component {
             )
         }
 
-    }
-
-    autoSave = () => {
-        return setTimeout(this.submitChanges, 10000)
     }
 
     render () {
@@ -325,19 +315,14 @@ class DiaryPage extends Component {
                             referenceHeight = {0}
                         />
                         <br />
+                        <AutoSaveButton
+                            onSave = {this.submitChanges}
+                            buttonDisabled = {Object.keys(this.state.pendingChanges).length === 0}
+                        />
                         <Box sx={styles.statusLabel}>
                             {this.state.statusMessage}
                         </Box>
-                        <Box sx={styles.saveButton}>
-                            <Button
-                                variant='contained'
-                                color="primary"
-                                onClick={this.submitChanges}
-                                disabled={Object.keys(this.state.pendingChanges).length === 0}
-                            >
-                                Save
-                        </Button>
-                        </Box>
+
                 </Box>
             </div>
         )
