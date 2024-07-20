@@ -17,9 +17,11 @@ const styles = {
     rightPanel: {
         marginLeft: '100px',
         maxWidth: 'calc(100% - 100px)',
-        maxHeight: 'calc(100vh - 100px)',
         paddingRight: '10px',
-        overflow: 'auto'
+    },
+    tableContainer: {
+        maxHeight: 'calc(100vh - 100px)',
+        overflowY: 'scroll'
     },
     categoryList: {
         marginTop: '5px',
@@ -27,7 +29,8 @@ const styles = {
         overflow: 'auto'
     },
     statusLabel: {
-        float: 'right'
+        marginLeft: '10px',
+        float: 'left'
     }
 }
 
@@ -305,35 +308,37 @@ class Logbook extends Component {
 
                 <Box sx={styles.rightPanel}>
                     {!this.state.editMode ? 
-                        <Table>
-                            <TableHead>
+                        <Box sx={styles.tableContainer}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                    {this.state.columns.map( (column, i) => 
+                                        <TableCell key={'title-'+column}>{column}</TableCell>
+                                    )
+                                    }
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
                                 <TableRow>
-                                {this.state.columns.map( (column, i) => 
-                                    <TableCell key={'title-'+column}>{column}</TableCell>
-                                )
-                                }
+                                    <TableCell onClick={this.createEntry}>New...</TableCell>
                                 </TableRow>
-                            </TableHead>
-                            <TableBody>
-                            <TableRow>
-                                <TableCell onClick={this.createEntry}>New...</TableCell>
-                            </TableRow>
-                            {this.state.list.map( (entry, i) => 
-                                <TableRow
-                                    key={'row-'+i}
-                                    selected={this.state.entryIndex === i}
-                                >
-                                    {this.state.columns.map( (column) => 
-                                        <TableCell
-                                            key={i+column}
-                                            onClick={this.handleTableCellClick.bind(this, i)}>
-                                        {(entry && entry[column]) ? entry[column] : ''}
-                                        </TableCell>
-                                    )}
-                                </TableRow>
-                            )}
-                            </TableBody>
-                        </Table>
+                                {this.state.list.map( (entry, i) => 
+                                    <TableRow
+                                        key={'row-'+i}
+                                        selected={this.state.entryIndex === i}
+                                    >
+                                        {this.state.columns.map( (column) => 
+                                            <TableCell
+                                                key={i+column}
+                                                onClick={this.handleTableCellClick.bind(this, i)}>
+                                            {(entry && entry[column]) ? entry[column] : ''}
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                )}
+                                </TableBody>
+                            </Table>
+                        </Box>
                         :
                         <LogbookItemEditor
                             columns = {this.state.columns}
@@ -341,10 +346,9 @@ class Logbook extends Component {
                             liftState = {this.handleApplyEdits}
                             handleDelete = {this.handleDelete}
                         />}
-                </Box>
-
-                <Box sx={styles.statusLabel}>
-                    {this.state.statusMessage}
+                        <Box sx={styles.statusLabel}>
+                            {this.state.statusMessage}
+                        </Box>
                 </Box>
             </div>
         )
