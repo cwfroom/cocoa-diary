@@ -44,6 +44,7 @@ class Logbook extends Component {
             columns: [],
             list: [],
             editMode: false,
+            selectedSegment: 'Default',
             entryIndex: null,
             activeEntry: null,
             statusMessage: ''
@@ -77,7 +78,7 @@ class Logbook extends Component {
             this.logbookFetch('category', body, (result) => {
                 this.setState({
                     columns: result['Columns'],
-                    list: result['List']
+                    list: result['List'][this.state.selectedSegment]
                 })
             })
         }
@@ -133,10 +134,17 @@ class Logbook extends Component {
         }
     }
 
-    submitListEdit = (action, index) => {
+    locatorHelper (index = this.state.entryIndex) {
+        return {
+            'segment': this.state.selectedSegment,
+            'index': index
+        }
+    }
+
+    submitListEdit = (action, locator) => {
         const body = {
             'category': this.state.categories[this.state.categoryIndex],
-            'index': index
+            'locator': locator
         }
         this.logbookFetch(action, body, (result) => {
             this.setState({
@@ -147,7 +155,7 @@ class Logbook extends Component {
 
     handleDelete = () => {
         if (this.state.entryIndex !== null) {
-            this.submitListEdit('delete', this.state.entryIndex)
+            this.submitListEdit('delete', this.locatorHelper())
             this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.entryIndex, 1)
@@ -161,7 +169,7 @@ class Logbook extends Component {
     }
 
     handleInsert = () => {
-        this.submitListEdit('insert', this.state.entryIndex)
+        this.submitListEdit('insert', this.locatorHelper())
         this.setState( (state) => {
             let listCopy = [...state.list]
             listCopy.splice(this.state.entryIndex + 1, 0, {})
@@ -183,6 +191,8 @@ class Logbook extends Component {
             list: update(this.state.list, {$unshift: [newEntry]}),
             activeEntry: newEntry,
             editMode: true
+        }, () => {
+            this.submitListEdit('insert', this.locatorHelper())
         })
     }
 
@@ -190,12 +200,12 @@ class Logbook extends Component {
         if (this.state.entryIndex !== null) {
             if (direction === 'up') {
                 if (this.state.entryIndex < this.state.list.length) {
-                    this.submitListEdit('swap', [this.state.entryIndex, this.state.entryIndex - 1])
+                    this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex - 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex - 1)
                 }
             }else if (direction === 'down'){
                 if (this.state.entryIndex >= 0) {
-                    this.submitListEdit('swap', [this.state.entryIndex, this.state.entryIndex + 1])
+                    this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex + 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex + 1)
                 }
             }
@@ -241,7 +251,7 @@ class Logbook extends Component {
         this.logbookFetch('reload', body, (result) => {
             this.setState({
                 columns: result['Columns'],
-                list: result['List']
+                list: result['List'][this.state.selectedSegment]
             })
         })
     }
@@ -255,7 +265,7 @@ class Logbook extends Component {
     submitEntryEdit () {
         const body = {
             'category': this.state.categories[this.state.categoryIndex],
-            'changes': update(this.state.activeEntry, {'Index': {$set: this.state.entryIndex}})
+            'changes': update(this.state.activeEntry, {'locator': {$set: this.locatorHelper()}})
         }
         this.logbookFetch('submit', body, (result) => {
             this.setState({

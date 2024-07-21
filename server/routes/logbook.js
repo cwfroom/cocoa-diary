@@ -30,13 +30,13 @@ function saveFile () {
 }
 
 function updateEntry (changes) {
-    const index = changes['Index']
+    const { segment, index } = changes.locator 
     let list = fileCache['List']
     const keys = fileCache['Columns']
     keys.forEach( key => {
             if (changes[key]) {
-                if (!list[index]) list[index] = {}
-                list[index][key] = changes[key]
+                if (!list[segment][index]) list[segment][index] = {}
+                list[segment][index][key] = changes[key]
             }
     })
     // Handle notes change
@@ -44,15 +44,15 @@ function updateEntry (changes) {
         // Alias change
         if (changes['Alias']) {
             // Rename file if exists
-            if (list[index]['Alias'] && fs.existsSync(getNotesPath(list[index]['Alias']))) {
-                fs.renameSync(getNotesPath(list[index]['Alias']), getNotesPath(changes['Alias']))
+            if (list[segment][index]['Alias'] && fs.existsSync(getNotesPath(list[segment][index]['Alias']))) {
+                fs.renameSync(getNotesPath(list[segment][index]['Alias']), getNotesPath(changes['Alias']))
             }
-            list[index]['Alias'] = changes['Alias']
+            list[segment][index]['Alias'] = changes['Alias']
         }
-            updateNotes(list[index]['Alias'], changes['Notes'])
+            updateNotes(list[segment][index]['Alias'], changes['Notes'])
     }
     fileCache['List'] = list
-    return 'Updated Index ' + index
+    return `Updated ${segment} Index ${index}`
 }
 
 function readNotes (alias) {
@@ -70,24 +70,28 @@ function updateNotes (alias, notes) {
     fs.writeFileSync(notesPath, JSON.stringify(notesObj, null, '\t'))
 }
 
-function deleteEntry (index) {
-    if (fileCache['List'][index]['Alias']) {
-        const notespath = getNotesPath(fileCache['List'][index]['Alias'])
+function deleteEntry (locator) {
+    const { segment, index } = locator
+    if (fileCache['List'][segment][index]['Alias']) {
+        const notespath = getNotesPath(fileCache['List'][segment][index]['Alias'])
         fs.unlinkSync(notespath)
     }
-    fileCache['List'].splice(index, 1)
-    return 'Deleted Index ' + index
+    fileCache['List'][segment].splice(index, 1)
+    return `Deleted ${segment} Index ${index}`
 }
 
-function insertEntry (index) {
-    fileCache['List'].splice(index, 0, {})
+function insertEntry (locator) {
+    const { segment, index } = locator
+    fileCache['List'][segment].splice(index, 0, {})
+    return `Inserted ${segment} Index ${index}`
 }
 
-function swapEntry (index) {
-    let temp = fileCache['List'][index[0]]
-    fileCache['List'][index[0]] = fileCache['List'][index[1]]
-    fileCache['List'][index[1]] = temp
-    return `Swapped Index ${index[0]} and ${index[1]}` 
+function swapEntry (locator) {
+    const { segment, index } = locator
+    let temp = fileCache['List'][segment][index[0]]
+    fileCache['List'][segment][index[0]] = fileCache['List'][segment][index[1]]
+    fileCache['List'][segment][index[1]] = temp
+    return `Swapped ${segment} Index ${index[0]} and ${index[1]}` 
 }
 
 function sendResult(res, success, message) {
@@ -128,15 +132,15 @@ router.post('/submit', (req, res) => {
 })
 
 router.post('/delete', (req, res) => {
-    generalHandler(req, res, deleteEntry, 'index')
+    generalHandler(req, res, deleteEntry, 'locator')
 })
 
 router.post('/insert', (req, res) => {
-    generalHandler(req, res, insertEntry, 'index')
+    generalHandler(req, res, insertEntry, 'locator')
 })
 
 router.post('/swap', (req, res) => {
-    generalHandler(req, res, swapEntry, 'index')
+    generalHandler(req, res, swapEntry, 'locator')
 })
 
 router.post('/notes', (req, res) => {
