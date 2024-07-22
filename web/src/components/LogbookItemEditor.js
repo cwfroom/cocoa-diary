@@ -139,7 +139,7 @@ class LogbookItemEditor extends Component {
                         >
                             <TextField
                                 label = {column}
-                                value = {this.state.entry[column]}
+                                value = {this.state.entry[column] ? this.state.entry[column] : ''}
                                 onChange = {this.handleEntryEdit(column)}
                                 fullWidth
                             />
