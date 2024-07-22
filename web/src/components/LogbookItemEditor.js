@@ -23,7 +23,7 @@ class LogbookItemEditor extends Component {
         }
     }
 
-    componentDidMount () {
+    componentDidMount = () => {
         this.updateListHeight()
     }
 
@@ -32,7 +32,7 @@ class LogbookItemEditor extends Component {
         if (this.state.toggleProps) {
             height = height * 3
         }else{
-            height = height * (this.props.columns.length + 1)
+            height = height * (this.props.columns.length + 2)
         }
         this.setState({
             listHeight: height
