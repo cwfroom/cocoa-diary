@@ -34,7 +34,7 @@ const styles = {
     }
 }
 
-class Logbook extends Component {
+class LogbookPage extends Component {
     constructor (props) {
         super(props)
 
@@ -44,7 +44,8 @@ class Logbook extends Component {
             columns: [],
             list: [],
             editMode: false,
-            selectedSegment: 'Default',
+            segments: ['Default'],
+            segmentIndex: 0,
             entryIndex: null,
             activeEntry: null,
             statusMessage: ''
@@ -78,7 +79,7 @@ class Logbook extends Component {
             this.logbookFetch('category', body, (result) => {
                 this.setState({
                     columns: result['Columns'],
-                    list: result['List'][this.state.selectedSegment]
+                    list: result['List'][this.state.segments[this.state.segmentIndex]]
                 })
             })
         }
@@ -136,7 +137,7 @@ class Logbook extends Component {
 
     locatorHelper (index = this.state.entryIndex) {
         return {
-            'segment': this.state.selectedSegment,
+            'segment': this.state.segments[this.state.segmentIndex],
             'index': index
         }
     }
@@ -251,7 +252,7 @@ class Logbook extends Component {
         this.logbookFetch('reload', body, (result) => {
             this.setState({
                 columns: result['Columns'],
-                list: result['List'][this.state.selectedSegment]
+                list: result['List'][this.state.segments[this.state.segmentIndex]]
             })
         })
     }
@@ -368,4 +369,4 @@ class Logbook extends Component {
     }
 }
 
-export default Logbook
+export default LogbookPage
