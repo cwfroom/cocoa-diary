@@ -1,9 +1,11 @@
 import React, {Component} from 'react'
-import { Box, List, ListItemButton } from '@mui/material'
+import { Box, IconButton, List, ListItemButton } from '@mui/material'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add';
 import LogbookPage from './LogbookPage'
 import TabBar from '../components/TabBar'
 import LogbookItemEditor from '../components/LogbookItemEditor'
+import moment from 'moment';
 
 const styles = {
     leftPanel: {
@@ -25,6 +27,10 @@ const styles = {
     tableContainer: {
         maxHeight: 'calc(100vh - 120px)',
         overflowY: 'auto'
+    },
+    statusText: {
+        padding: '0',
+        textAlign: 'center'
     }
 }
 
@@ -76,11 +82,59 @@ class AnimePage extends LogbookPage {
 
     tableCellHelper(key, value, index) {
         return <TableCell
-            id = {`${key}-cell-${index}`}
+            key = {`${key}-cell-${index}`}
             onClick = {this.handleTableCellClick.bind(this, index)}
         >
             {value}
         </TableCell>
+    }
+
+    handleCounterUpClick = (index) => {
+        let selectedEntry = this.state.list[index]
+        let counter = this.counterHelper(selectedEntry['Watched'])
+        if (counter.length === 1) {
+            selectedEntry['Watched'] = `${counter[0] + 1}`
+        }else {
+            selectedEntry['Watched'] = `${counter[0] + 1}(${counter[1] + 1})`
+        }
+        const date = new Date()
+        const formattedDate = moment(date).format('YY/MM/DD')
+        selectedEntry['Date'] = formattedDate
+        this.handleApplyEdits(selectedEntry, false)
+    }
+
+    statusCellHelper (finished, index) {
+        if (finished) {
+            return <TableCell
+                sx = {styles.statusText}
+                key = {`Status-cell-${index}`}
+                onClick = {this.handleTableCellClick.bind(this, index)}
+            >
+                終
+            </TableCell>
+        } else {
+            return <TableCell
+                sx = {styles.statusText}
+                key = {`Status-cell-${index}`}
+                onClick = {this.handleCounterUpClick.bind(this, index)}
+            >
+                <IconButton
+                    size = 'small'
+                ><AddIcon fontSize = 'small'/></IconButton>
+            </TableCell>
+        }
+    }
+
+    counterHelper (str) {
+        if (str === undefined || str === '') {
+            return 0
+        }
+        let match = str.match(/(\d+)\((\d+)\)/)
+        if (match) {
+            return [parseInt(match[1]), parseInt(match[2])]
+        }else {
+            return [parseInt(str)]
+        }
     }
 
     tableRowHelper (entry, index) {
@@ -89,7 +143,9 @@ class AnimePage extends LogbookPage {
             cells.push(this.tableCellHelper('AirTime', entry['AirTime'], index))
         }
         cells.push(this.tableCellHelper('Title', entry['Title'], index))
-        cells.push(this.tableCellHelper('Watched', entry['Watched'], index))
+        cells.push(this.tableCellHelper('Watched', `${entry['Watched']}`, index))
+        let finished = this.counterHelper(entry['Watched'])[0] === this.counterHelper(entry['Total'])[0]
+        cells.push(this.statusCellHelper(finished, index))
         cells.push(this.tableCellHelper('Date', entry['Date'], index))
         return <TableRow
                 key = {`row-${index}`}
@@ -108,7 +164,7 @@ class AnimePage extends LogbookPage {
         if (airDays.length > 0) {
             for (let i = 0; i < airDays.length; i++) {
                 tableRows.push(<TableRow key={`Airday-row-${i}`}>
-                                <TableCell key={`Airday-cell-${i}`} colSpan={4}>
+                                <TableCell key={`Airday-cell-${i}`} colSpan={5}>
                                     {airDays[i]}
                                 </TableCell>
                                 </TableRow>)
