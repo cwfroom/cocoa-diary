@@ -28,9 +28,16 @@ const styles = {
         maxHeight: 'calc(100vh - 120px)',
         overflowY: 'auto'
     },
-    statusText: {
+    statusCell: {
         padding: '0',
         textAlign: 'center'
+    },
+    statusLabel: {
+        marginLeft: '10px',
+        float: 'left'
+    },
+    counterLabel: {
+        float: 'right'
     }
 }
 
@@ -106,7 +113,7 @@ class AnimePage extends LogbookPage {
     statusCellHelper (finished, index) {
         if (finished) {
             return <TableCell
-                sx = {styles.statusText}
+                sx = {styles.statusCell}
                 key = {`Status-cell-${index}`}
                 onClick = {this.handleTableCellClick.bind(this, index)}
             >
@@ -114,7 +121,7 @@ class AnimePage extends LogbookPage {
             </TableCell>
         } else {
             return <TableCell
-                sx = {styles.statusText}
+                sx = {styles.statusCell}
                 key = {`Status-cell-${index}`}
                 onClick = {this.handleCounterUpClick.bind(this, index)}
             >
@@ -126,7 +133,7 @@ class AnimePage extends LogbookPage {
     }
 
     counterHelper (str) {
-        if (str === undefined || str === '') {
+        if (str === undefined || str === '' || str === '-') {
             return 0
         }
         let match = str.match(/(\d+)\((\d+)\)/)
@@ -184,6 +191,33 @@ class AnimePage extends LogbookPage {
         )
     }
 
+    seasonListCounter (list) {
+        let episodes = 0
+        for (let i = 0; i < list.length; i++) {
+            episodes += this.counterHelper(list[i]['Watched'])[0]
+        }
+        return [list.length, episodes]
+    }
+
+    totalCouter () {
+        let seasonSeries = 0
+        let seasonEpisodes = 0
+        let lifelongSeries = 0
+        let lifelongEpisodes = 0
+        for (let i = 0; i < this.state.segments.length; i++) {
+            const listTotal = this.seasonListCounter(this.state.data[this.state.segments[i]])
+            if (this.state.segmentIndex === i) {
+                seasonSeries = listTotal[0]
+                seasonEpisodes = listTotal[1]
+            }
+            lifelongSeries += listTotal[0]
+            lifelongEpisodes += listTotal[1]
+        }
+        return <Box sx = {styles.counterLabel}>Season Series {seasonSeries}, Season Episodes {seasonEpisodes} <br/> 
+        Lifelong Series {lifelongSeries}, Lifelong Episodes {lifelongEpisodes}</Box>
+        
+    }
+
     render () {
         return (
             <div>
@@ -224,7 +258,8 @@ class AnimePage extends LogbookPage {
                             liftState = {this.handleApplyEdits}
                             handleDelete = {this.handleDelete}
                         />}
-                        <Box sx={styles.statusLabel}>
+                        {this.totalCouter()}
+                        <Box sx={styles.statusText}>
                             {this.state.statusMessage}
                         </Box>
                 </Box>
