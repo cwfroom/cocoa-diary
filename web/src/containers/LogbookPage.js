@@ -42,6 +42,7 @@ class LogbookPage extends Component {
             categories: [],
             categoryIndex: null,
             columns: [],
+            data: {},
             list: [],
             editMode: false,
             segments: ['Default'],
@@ -79,6 +80,7 @@ class LogbookPage extends Component {
             this.logbookFetch('category', body, (result) => {
                 this.setState({
                     columns: result['Columns'],
+                    data: result['List'],
                     list: result['List'][this.state.segments[this.state.segmentIndex]]
                 })
             })
@@ -159,32 +161,28 @@ class LogbookPage extends Component {
         })
     }
 
+    applyLocalListEdits = () => {
+        this.setState({
+            data: update(this.state.data, {[this.state.segments[this.state.segmentIndex]]: {$set: this.state.list}})
+        })
+    }
+
     handleDelete = () => {
         if (this.state.entryIndex !== null) {
             this.submitListEdit('delete', this.locatorHelper())
-            this.setState( (state) => {
-            let listCopy = [...state.list]
-            listCopy.splice(this.state.entryIndex, 1)
-            return {
-                ...state,
+            this.setState({
                 editMode: false,
-                list: listCopy
-            }
-        })
+                list: update(this.state.list, {$splice: [[this.state.entryIndex, 1]]})
+            }, this.applyLocalListEdits)
         }
     }
 
     handleInsert = () => {
         this.submitListEdit('insert', this.locatorHelper())
-        this.setState( (state) => {
-            let listCopy = [...state.list]
-            listCopy.splice(this.state.entryIndex + 1, 0, {})
-            return {
-                ...state,
-                editMode: false,
-                list: listCopy
-            }
-        })
+        this.setState({
+            editMode: false,
+            list: update(this.state.list, {$splice: [[this.state.entryIndex + 1, 0]]})
+        }, this.applyLocalListEdits)
     }
 
     createEntry = () => {
@@ -198,6 +196,7 @@ class LogbookPage extends Component {
             activeEntry: newEntry,
             editMode: true
         }, () => {
+            this.applyLocalListEdits()
             this.submitListEdit('insert', this.locatorHelper())
         })
     }
@@ -229,7 +228,7 @@ class LogbookPage extends Component {
                 list: listCopy,
                 entryIndex: other
             }
-        })
+        }, this.applyLocalListEdits)
     }
 
     hotKeys = (event) => {
@@ -285,7 +284,7 @@ class LogbookPage extends Component {
         })
         this.setState({
             list: update(this.state.list, {[this.state.entryIndex]: {$set: this.state.activeEntry}})
-        })
+        }, this.applyLocalListEdits)
     }
 
 
