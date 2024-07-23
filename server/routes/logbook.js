@@ -34,7 +34,7 @@ function updateEntry (changes) {
     let list = fileCache['List']
     const keys = fileCache['Columns']
     keys.forEach( key => {
-            if (changes[key]) {
+            if (changes[key] !== undefined) {
                 if (!list[segment][index]) list[segment][index] = {}
                 list[segment][index][key] = changes[key]
             }
