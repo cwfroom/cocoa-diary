@@ -1,11 +1,11 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { Box, IconButton, List, ListItemButton } from '@mui/material'
-import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add';
+import { Table, TableBody, TableRow, TableCell } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import LogbookPage from './LogbookPage'
 import TabBar from '../components/TabBar'
 import LogbookItemEditor from '../components/LogbookItemEditor'
-import moment from 'moment';
+import moment from 'moment'
 
 const styles = {
     leftPanel: {
@@ -92,7 +92,7 @@ class AnimePage extends LogbookPage {
             key = {`${key}-cell-${index}`}
             onClick = {this.handleTableCellClick.bind(this, index)}
         >
-            {value}
+            {value !== undefined ? value : ''}
         </TableCell>
     }
 
@@ -144,10 +144,12 @@ class AnimePage extends LogbookPage {
         }
     }
 
-    tableRowHelper (entry, index) {
+    tableRowHelper (entry, index, filler = false) {
         let cells = []
-        if (entry['AirDay'] && entry['AirTime']) {
+        if (entry['AirDay'] !== undefined && entry['AirTime'] !== undefined) {
             cells.push(this.tableCellHelper('AirTime', entry['AirTime'], index))
+        } else if (filler) {
+            cells.push(this.tableCellHelper('AirTime', '', index))
         }
         cells.push(this.tableCellHelper('Title', entry['Title'], index))
         cells.push(this.tableCellHelper('Watched', `${entry['Watched']}`, index))
@@ -169,6 +171,7 @@ class AnimePage extends LogbookPage {
         }
         let tableRows = []
         if (airDays.length > 0) {
+            let displayedIndex = []
             for (let i = 0; i < airDays.length; i++) {
                 tableRows.push(<TableRow key={`Airday-row-${i}`}>
                                 <TableCell key={`Airday-cell-${i}`} colSpan={5}>
@@ -178,6 +181,20 @@ class AnimePage extends LogbookPage {
                 for (let j = 0; j < this.state.list.length; j++) {
                     if (this.state.list[j]['AirDay'] === airDays[i]) {
                         tableRows.push(this.tableRowHelper(this.state.list[j], j))
+                        displayedIndex.push(j)
+                    }
+                }
+            }
+            // Remaining entires
+            if (displayedIndex.length !== this.state.list.length) {
+                tableRows.push(<TableRow key={`Airday-row-unspecified`}>
+                    <TableCell key={`Airday-cell-unspecified`} colSpan={5}>
+                        Unspecified
+                    </TableCell>
+                    </TableRow>)
+                for (let i = 0; i < this.state.list.length; i++) {
+                    if (!displayedIndex.includes(i)) {
+                        tableRows.push(this.tableRowHelper(this.state.list[i], i, true))
                     }
                 }
             }
