@@ -21,6 +21,7 @@ class AutoSaveButton extends Component {
 
     componentWillUnmount = () => {
         document.removeEventListener('keydown', this.hotKey)
+        clearTimeout(this.autoSaveTimer)
     }
 
     componentDidUpdate(prevProps, prevState) {
