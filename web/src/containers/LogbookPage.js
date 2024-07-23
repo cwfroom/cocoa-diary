@@ -204,11 +204,17 @@ class LogbookPage extends Component {
     swapEntry = (direction) => {
         if (this.state.entryIndex !== null) {
             if (direction === 'up') {
+                if (this.state.entryIndex === 0) {
+                    return
+                }
                 if (this.state.entryIndex < this.state.list.length) {
                     this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex - 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex - 1)
                 }
             }else if (direction === 'down'){
+                if (this.state.entryIndex === this.state.list.length - 1) {
+                    return
+                }
                 if (this.state.entryIndex >= 0) {
                     this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex + 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex + 1)

@@ -165,7 +165,7 @@ class AnimePage extends LogbookPage {
     prepareTable () {
         let airDays = []
         for (let i = 0; i < this.state.list.length; i++) {
-            if (this.state.list[i]['AirDay'] && !airDays.includes(this.state.list[i]['AirDay'])) {
+            if (this.state.list[i] && this.state.list[i]['AirDay'] && !airDays.includes(this.state.list[i]['AirDay'])) {
                 airDays.push(this.state.list[i]['AirDay'])
             }
         }
@@ -179,7 +179,7 @@ class AnimePage extends LogbookPage {
                                 </TableCell>
                                 </TableRow>)
                 for (let j = 0; j < this.state.list.length; j++) {
-                    if (this.state.list[j]['AirDay'] === airDays[i]) {
+                    if (this.state.list[j] && this.state.list[j]['AirDay'] === airDays[i]) {
                         tableRows.push(this.tableRowHelper(this.state.list[j], j))
                         displayedIndex.push(j)
                     }
@@ -193,7 +193,7 @@ class AnimePage extends LogbookPage {
                     </TableCell>
                     </TableRow>)
                 for (let i = 0; i < this.state.list.length; i++) {
-                    if (!displayedIndex.includes(i)) {
+                    if (!displayedIndex.includes(i) && this.state.list[i]) {
                         tableRows.push(this.tableRowHelper(this.state.list[i], i, true))
                     }
                 }
@@ -211,7 +211,9 @@ class AnimePage extends LogbookPage {
     seasonListCounter (list) {
         let episodes = 0
         for (let i = 0; i < list.length; i++) {
-            episodes += this.counterHelper(list[i]['Watched'])[0]
+            if (list[i]) {
+                episodes += this.counterHelper(list[i]['Watched'])[0]
+            }
         }
         return [list.length, episodes]
     }
