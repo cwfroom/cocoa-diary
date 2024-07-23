@@ -15,6 +15,7 @@ export default class TabBar extends Component{
             >
                 <Tab component={Link} to='/diary' label='Diary' value='/diary'/>
                 <Tab component={Link} to='/logbook' label='Logbook' value='/logbook'/>
+                <Tab component={Link} to='/anime' label='Anime' value='/anime'/>
                 <Tab component={Link} to='/search' label='Search' value='/search'/>
                 <Tab component={Link} to='/tools' label='Tools' value='/tools'/>
             </Tabs>

@@ -125,12 +125,17 @@ class LogbookPage extends Component {
             }else{
                 this.setState({
                     activeEntry: selectedEntry,
-                    editMode: true
+                    editMode: true,
+                    statusMessage: `Editing Segment ${this.state.segmentIndex} Index ${this.state.entryIndex}`
                 })
             }
         }else {
             this.setState({
-                entryIndex: value
+                entryIndex: value,
+            }, () => {
+                this.setState({
+                    statusMessage: `Selected Segment ${this.state.segmentIndex} Index ${this.state.entryIndex}`
+                })
             })
         }
     }
