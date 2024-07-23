@@ -258,7 +258,7 @@ class AnimePage extends LogbookPage {
                             liftState = {this.handleApplyEdits}
                             handleDelete = {this.handleDelete}
                         />}
-                        {this.totalCouter()}
+                        {!this.state.editMode ? this.totalCouter() : ''}
                         <Box sx={styles.statusText}>
                             {this.state.statusMessage}
                         </Box>
