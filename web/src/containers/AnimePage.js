@@ -107,7 +107,9 @@ class AnimePage extends LogbookPage {
         const date = new Date()
         const formattedDate = moment(date).format('YY/MM/DD')
         selectedEntry['Date'] = formattedDate
-        this.handleApplyEdits(selectedEntry, false)
+        this.setState({
+            entryIndex: index
+        }, this.handleApplyEdits(selectedEntry, false))
     }
 
     statusCellHelper (finished, index) {
