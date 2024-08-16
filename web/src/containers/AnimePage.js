@@ -148,7 +148,7 @@ class AnimePage extends LogbookPage {
 
     tableRowHelper (entry, index, filler = false) {
         let cells = []
-        if (entry['AirDay'] !== undefined && entry['AirTime'] !== undefined) {
+        if (entry['AirDay'] !== undefined && entry['AirTime'] !== undefined && entry['AirTime'] !== '') {
             cells.push(this.tableCellHelper('AirTime', entry['AirTime'], index))
         } else if (filler) {
             cells.push(this.tableCellHelper('AirTime', '', index))
