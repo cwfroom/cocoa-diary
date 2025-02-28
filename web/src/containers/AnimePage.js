@@ -212,12 +212,17 @@ class AnimePage extends LogbookPage {
 
     seasonListCounter (list) {
         let episodes = 0
+        let series = 0
         for (let i = 0; i < list.length; i++) {
             if (list[i]) {
-                episodes += this.counterHelper(list[i]['Watched'])[0]
+                const episodeInt = this.counterHelper(list[i]['Watched'])[0]
+                episodes += episodeInt
+                if (episodeInt > 0) {
+                    series += 1
+                }
             }
         }
-        return [list.length, episodes]
+        return [series, episodes]
     }
 
     totalCouter () {
@@ -231,8 +236,10 @@ class AnimePage extends LogbookPage {
                 seasonSeries = listTotal[0]
                 seasonEpisodes = listTotal[1]
             }
-            lifelongSeries += listTotal[0]
-            lifelongEpisodes += listTotal[1]
+            if (this.state.segments[i] !== 'Rewatch') {
+                lifelongSeries += listTotal[0]
+                lifelongEpisodes += listTotal[1]
+            }
         }
         return <Box sx = {styles.counterLabel}>Season Series {seasonSeries}, Season Episodes {seasonEpisodes} <br/> 
         Lifelong Series {lifelongSeries}, Lifelong Episodes {lifelongEpisodes}</Box>
