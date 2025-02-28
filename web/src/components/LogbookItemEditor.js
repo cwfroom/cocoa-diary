@@ -145,7 +145,7 @@ class LogbookItemEditor extends Component {
                             />
                         </ListItem>
                     )}
-                    {this.state.entry['Alias'] && 
+                    {!this.state.toggleProps && this.state.entry['Alias'] && 
                         <ListItem key = {'listitem-Alias'}>
                             <TextField
                                 label = 'Alias'
