@@ -94,6 +94,13 @@ function swapEntry (locator) {
     return `Swapped ${segment} Index ${index[0]} and ${index[1]}` 
 }
 
+function pinEntry(locator) {
+    const { segment, index } = locator
+    let temp = fileCache['List'][segment].splice(index, 1)[0]
+    fileCache['List'][segment].unshift(temp)
+    return `Pinned ${segment} Index ${index}`
+}
+
 function sendResult(res, success, message) {
     if (success) {
         res.send({'Result': message, 'Timestamp': Date.now() / 1000})
@@ -141,6 +148,10 @@ router.post('/insert', (req, res) => {
 
 router.post('/swap', (req, res) => {
     generalHandler(req, res, swapEntry, 'locator')
+})
+
+router.post('/pin', (req, res) => {
+    generalHandler(req, res, pinEntry, 'locator')
 })
 
 router.post('/notes', (req, res) => {

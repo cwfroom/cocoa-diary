@@ -204,22 +204,23 @@ class LogbookPage extends Component {
     swapEntry = (direction) => {
         if (this.state.entryIndex !== null) {
             if (direction === 'up') {
-                if (this.state.entryIndex === 0) {
-                    return
-                }
-                if (this.state.entryIndex < this.state.list.length) {
+                if (this.state.entryIndex !== 0 && this.state.entryIndex < this.state.list.length) {
                     this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex - 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex - 1)
                 }
             }else if (direction === 'down'){
-                if (this.state.entryIndex === this.state.list.length - 1) {
-                    return
-                }
-                if (this.state.entryIndex >= 0) {
+                if (this.state.entryIndex !== this.state.list.length - 1 && this.state.entryIndex >= 0) {
                     this.submitListEdit('swap', this.locatorHelper([this.state.entryIndex, this.state.entryIndex + 1]))
                     this.localSwap(this.state.entryIndex, this.state.entryIndex + 1)
                 }
             }
+        }
+    }
+
+    pinEntry = () => {
+        if (this.state.entryIndex !== null && this.state.entryIndex !== 0 && this.state.entryIndex < this.state.list.length) {
+            this.submitListEdit('pin', this.locatorHelper(this.state.entryIndex))
+            this.localPin(this.state.entryIndex)
         }
     }
 
@@ -237,6 +238,19 @@ class LogbookPage extends Component {
         }, this.applyLocalListEdits)
     }
 
+    localPin = (index) => {
+        this.setState( (state) => {
+            let listCopy = [...state.list]
+            let temp = listCopy.splice(index, 1)[0]
+            listCopy.unshift(temp)
+            return {
+                ...state,
+                list: listCopy,
+                entryIndex: 0
+            }
+        }, this.applyLocalListEdits)
+    }
+
     hotKeys = (event) => {
         if (!this.state.editMode) {
             if (event.ctrlKey && event.altKey) {
@@ -248,6 +262,8 @@ class LogbookPage extends Component {
                     this.swapEntry('up')
                 }else if (event.key === 'ArrowDown') {
                     this.swapEntry('down')
+                }else if (event.key === 'ArrowLeft') {
+                    this.pinEntry()
                 }else if (event.key === 'd' || event.key === 'D') {
                     this.handleDelete()
                 }
