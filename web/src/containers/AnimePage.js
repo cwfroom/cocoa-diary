@@ -274,6 +274,7 @@ class AnimePage extends LogbookPage {
                         </Box>
                         :
                         <LogbookItemEditor
+                            category = {this.state.categories[this.state.categoryIndex]}
                             columns = {this.state.columns}
                             activeEntry = {this.state.activeEntry}
                             liftState = {this.handleApplyEdits}

@@ -57,8 +57,14 @@ function updateEntry (changes) {
 
 function readNotes (alias) {
     const notesPath = getNotesPath(alias)
-    const notesObj = JSON.parse(fs.readFileSync(notesPath, {encoding: 'utf-8'}))
-    return notesObj
+    if (fs.existsSync(notesPath)) {
+        const notesObj = JSON.parse(fs.readFileSync(notesPath, {encoding: 'utf-8'}))
+        return notesObj
+    } else {
+        return {
+            'Notes': undefined
+        }
+    }
 }
 
 function updateNotes (alias, notes) {
@@ -70,14 +76,20 @@ function updateNotes (alias, notes) {
     fs.writeFileSync(notesPath, JSON.stringify(notesObj, null, '\t'))
 }
 
-function deleteEntry (locator) {
+function deleteEntryOnly (locator) {
+    const { segment, index } = locator
+    fileCache['List'][segment].splice(index, 1)
+    return `Deleted ${segment} Index ${index}`
+}
+
+function deleteEntryAndNotes (locator) {
     const { segment, index } = locator
     if (fileCache['List'][segment][index]['Alias']) {
         const notespath = getNotesPath(fileCache['List'][segment][index]['Alias'])
         fs.unlinkSync(notespath)
     }
     fileCache['List'][segment].splice(index, 1)
-    return `Deleted ${segment} Index ${index}`
+    return `Deleted ${segment} Index ${index} and Notes`
 }
 
 function insertEntry (locator) {
@@ -138,8 +150,12 @@ router.post('/submit', (req, res) => {
     generalHandler(req, res, updateEntry, 'changes')
 })
 
-router.post('/delete', (req, res) => {
-    generalHandler(req, res, deleteEntry, 'locator')
+router.post('/deleteEntryOnly', (req, res) => {
+    generalHandler(req, res, deleteEntryOnly, 'locator')
+})
+
+router.post('/deleteEntryAndNotes', (req, res) => {
+    generalHandler(req, res, deleteEntryAndNotes, 'locator')
 })
 
 router.post('/insert', (req, res) => {
@@ -157,13 +173,8 @@ router.post('/pin', (req, res) => {
 router.post('/notes', (req, res) => {
     const { category, alias } = req.body
     checkCache(category)
-    try {
-        const notesObj = readNotes(alias)
-        res.send(notesObj)
-    }catch(err) {
-        console.log(err)
-        res.send(err)
-    }
+    const notesObj = readNotes(alias)
+    res.send(notesObj)
 })
 
 // Force reload, mainly for debug purpose

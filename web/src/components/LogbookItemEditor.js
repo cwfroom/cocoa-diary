@@ -2,11 +2,13 @@ import React, {Component} from 'react'
 import { Box, ButtonGroup, List, ListItem, Button, TextField } from '@mui/material'
 import TextEditor from './TextEditor'
 import AutoSaveButton from './AutoSaveButton'
+import { Auth } from '../services/auth'
 import update from 'immutability-helper'
 
 class LogbookItemEditor extends Component {
     /*
         Required props
+        category
         columns
         activeEntry
         liftState
@@ -25,6 +27,12 @@ class LogbookItemEditor extends Component {
 
     componentDidMount = () => {
         this.updateListHeight()
+        this.fetchNotes()
+    }
+
+    logbookFetch = (route, body, callback) => {
+        Auth.authedFetch(`logbook/${route}`, body)
+        .then(result => callback(result))
     }
 
     updateListHeight () {
@@ -37,6 +45,30 @@ class LogbookItemEditor extends Component {
         this.setState({
             listHeight: height
         })
+    }
+
+    fetchNotes () {
+        if (this.state.entry['Alias']) {
+            const body = {
+                'category' : this.props.category,
+                'alias' : this.state.entry['Alias']
+            }
+            this.logbookFetch('notes', body, (result) => {
+                if (result['Notes'] !== undefined) {
+                    this.setState({
+                        entry: update(this.state.entry, { 
+                            'Notes': {$set: result['Notes']}
+                        })
+                    })
+                }else{
+                    this.setState({
+                        entry: update(this.state.entry, { 
+                            'Notes': {$set: ''}
+                        })
+                    })
+                }
+            })
+        }
     }
 
     handleTooglePropsButtonClick = (event) => {
@@ -55,12 +87,8 @@ class LogbookItemEditor extends Component {
     handleAddNotesButtonClick = (event) => {
         const alias = this.state.entry['Title'].replace(/[<>:"/\\|?*\s]/g, "").slice(0, 20)
         this.setState({
-            entry: update(this.state.entry, { 
-                'Alias': {$set: alias},
-                'Notes': {$set: ''}
-                }
-            )
-        })
+            entry: update(this.state.entry, {'Alias': {$set: alias}})
+        }, this.fetchNotes)
     }
 
     liftState = (applyEdits = false, quitEditMode = false) => {
@@ -113,9 +141,17 @@ class LogbookItemEditor extends Component {
                             <Button
                                 variant = 'outlined'
                                 color = 'error'
-                                onClick={this.props.handleDelete}
+                                disabled = {this.state.entry['Alias'] === undefined}
+                                onClick={() => {this.props.handleDelete(true)}}
                             >
-                                Delete
+                                Delete Notes
+                            </Button>
+                            <Button
+                                variant = 'outlined'
+                                color = 'error'
+                                onClick={() => {this.props.handleDelete(false)}}
+                            >
+                                Delete Entry
                             </Button>
                         </ButtonGroup>
                     </ListItem>

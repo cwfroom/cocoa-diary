@@ -109,28 +109,11 @@ class LogbookPage extends Component {
     handleTableCellClick = (value) => {
         let selectedEntry = this.state.list[this.state.entryIndex]
         if (value === this.state.entryIndex) {
-            if (selectedEntry['Alias']) {
-                const body = {
-                    'category' : this.state.categories[this.state.categoryIndex],
-                    'alias' : selectedEntry['Alias']
-                }
-                this.logbookFetch('notes', body, (result) => {
-                    if (result['Notes'] !== undefined) {
-                        this.setState({
-                            activeEntry: update(selectedEntry, {'Notes': {$set : result['Notes']}}),
-                            editMode: true
-                        })
-                    }else{
-                        console.log(result)
-                    }
-                })
-            }else{
-                this.setState({
-                    activeEntry: selectedEntry,
-                    editMode: true,
-                    statusMessage: `Editing Segment ${this.state.segmentIndex} Index ${this.state.entryIndex}`
-                })
-            }
+            this.setState({
+                activeEntry: selectedEntry,
+                editMode: true,
+                statusMessage: `Editing Segment ${this.state.segmentIndex} Index ${this.state.entryIndex}`
+            })
         }else {
             this.setState({
                 entryIndex: value,
@@ -167,9 +150,13 @@ class LogbookPage extends Component {
         })
     }
 
-    handleDelete = () => {
+    handleDelete = (deleteNotes = false) => {
         if (this.state.entryIndex !== null) {
-            this.submitListEdit('delete', this.locatorHelper())
+            if (deleteNotes) {
+                this.submitListEdit('deleteEntryAndNotes', this.locatorHelper())
+            } else {
+                this.submitListEdit('deleteEntryOnly', this.locatorHelper())
+            }
             this.setState({
                 editMode: false,
                 list: update(this.state.list, {$splice: [[this.state.entryIndex, 1]]})
@@ -381,6 +368,7 @@ class LogbookPage extends Component {
                         </Box>
                         :
                         <LogbookItemEditor
+                            category = {this.state.categories[this.state.categoryIndex]}
                             columns = {this.state.columns}
                             activeEntry = {this.state.activeEntry}
                             liftState = {this.handleApplyEdits}
