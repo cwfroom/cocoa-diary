@@ -81,7 +81,7 @@ class LogbookPage extends Component {
                 this.setState({
                     columns: result['Columns'],
                     data: result['List'],
-                    list: result['List'][this.state.segments[this.state.segmentIndex]]
+                    list: result['List'][this.state.segmentIndex]
                 })
             })
         }
@@ -94,6 +94,12 @@ class LogbookPage extends Component {
     logbookFetch = (route, body, callback) => {
         Auth.authedFetch(`logbook/${route}`, body)
         .then(result => callback(result))
+    }
+
+    updateStatusMessage (result) {
+        this.setState({
+            statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
+        })
     }
 
     handleCategoryListClick = (value) => {
@@ -127,7 +133,7 @@ class LogbookPage extends Component {
 
     locatorHelper (index = this.state.entryIndex) {
         return {
-            'segment': this.state.segments[this.state.segmentIndex],
+            'segment': this.state.segmentIndex,
             'index': index
         }
     }
@@ -138,15 +144,13 @@ class LogbookPage extends Component {
             'locator': locator
         }
         this.logbookFetch(action, body, (result) => {
-            this.setState({
-                statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
-            })
+            this.updateStatusMessage(result)
         })
     }
 
     applyLocalListEdits = () => {
         this.setState({
-            data: update(this.state.data, {[this.state.segments[this.state.segmentIndex]]: {$set: this.state.list}})
+            data: update(this.state.data, {[this.state.segmentIndex]: {$set: this.state.list}})
         })
     }
 
@@ -265,7 +269,7 @@ class LogbookPage extends Component {
         this.logbookFetch('reload', body, (result) => {
             this.setState({
                 columns: result['Columns'],
-                list: result['List'][this.state.segments[this.state.segmentIndex]]
+                list: result['List'][this.state.segmentIndex]
             })
         })
     }
@@ -282,9 +286,7 @@ class LogbookPage extends Component {
             'changes': update(this.state.activeEntry, {'locator': {$set: this.locatorHelper()}})
         }
         this.logbookFetch('submit', body, (result) => {
-            this.setState({
-                statusMessage: `${result['Result']} ${moment.unix(result['Timestamp']).format('YYYY/MM/DD HH:mm:ss Z')}`
-            })
+            this.updateStatusMessage(result)
             if (result['Result'] !== 'Error') {
                 this.setState(
                     {activeEntry: null}

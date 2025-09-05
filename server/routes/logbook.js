@@ -52,7 +52,7 @@ function updateEntry (changes) {
             updateNotes(list[segment][index]['Alias'], changes['Notes'])
     }
     fileCache['List'] = list
-    return `Updated ${segment} Index ${index}`
+    return `Updated Segment ${segment} Index ${index}`
 }
 
 function readNotes (alias) {
@@ -79,7 +79,7 @@ function updateNotes (alias, notes) {
 function deleteEntryOnly (locator) {
     const { segment, index } = locator
     fileCache['List'][segment].splice(index, 1)
-    return `Deleted ${segment} Index ${index}`
+    return `Deleted Segment ${segment} Index ${index}`
 }
 
 function deleteEntryAndNotes (locator) {
@@ -89,13 +89,13 @@ function deleteEntryAndNotes (locator) {
         fs.unlinkSync(notespath)
     }
     fileCache['List'][segment].splice(index, 1)
-    return `Deleted ${segment} Index ${index} and Notes`
+    return `Deleted Segment ${segment} Index ${index} and Notes`
 }
 
 function insertEntry (locator) {
     const { segment, index } = locator
     fileCache['List'][segment].splice(index, 0, {})
-    return `Inserted ${segment} Index ${index}`
+    return `Inserted Segment ${segment} Index ${index}`
 }
 
 function swapEntry (locator) {
@@ -103,14 +103,34 @@ function swapEntry (locator) {
     let temp = fileCache['List'][segment][index[0]]
     fileCache['List'][segment][index[0]] = fileCache['List'][segment][index[1]]
     fileCache['List'][segment][index[1]] = temp
-    return `Swapped ${segment} Index ${index[0]} and ${index[1]}` 
+    return `Swapped Segment ${segment} Index ${index[0]} and ${index[1]}` 
 }
 
 function pinEntry(locator) {
     const { segment, index } = locator
     let temp = fileCache['List'][segment].splice(index, 1)[0]
     fileCache['List'][segment].unshift(temp)
-    return `Pinned ${segment} Index ${index}`
+    return `Pinned Segment ${segment} Index ${index}`
+}
+
+function renameSegment(payload) {
+    const { segment, text } = payload
+    fileCache['Segments'].splice(segment, 1, text)
+    return `Renamed Segment ${segment} to ${text}`
+}
+
+function addSegment(payload) {
+    const { text } = payload
+    fileCache['Segments'].unshift(text)
+    fileCache['List'].unshift([])
+    return `Added Segment ${text}`
+}
+
+function deleteSegment(payload) {
+    const { segment } = payload
+    fileCache['Segments'].splice(segment, 1)
+    fileCache['List'].splice(segment, 1)
+    return `Delete Segment ${segment}`
 }
 
 function sendResult(res, success, message) {
@@ -168,6 +188,18 @@ router.post('/swap', (req, res) => {
 
 router.post('/pin', (req, res) => {
     generalHandler(req, res, pinEntry, 'locator')
+})
+
+router.post('/renameSegment', (req, res) => {
+    generalHandler(req, res, renameSegment, 'payload')
+})
+
+router.post('/addSegment', (req, res) => {
+    generalHandler(req, res, addSegment, 'payload')
+})
+
+router.post('/deleteSegment', (req, res) => {
+    generalHandler(req, res, deleteSegment, 'payload')
 })
 
 router.post('/notes', (req, res) => {

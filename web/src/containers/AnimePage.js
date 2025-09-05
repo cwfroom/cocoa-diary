@@ -5,7 +5,9 @@ import AddIcon from '@mui/icons-material/Add'
 import LogbookPage from './LogbookPage'
 import TabBar from '../components/TabBar'
 import LogbookItemEditor from '../components/LogbookItemEditor'
+import EditorDialog from '../components/EditorDialog'
 import moment from 'moment'
+import update from 'immutability-helper'
 
 const styles = {
     leftPanel: {
@@ -56,7 +58,10 @@ class AnimePage extends LogbookPage {
             segmentIndex: 0,
             entryIndex: null,
             activeEntry: null,
-            statusMessage: ''
+            statusMessage: '',
+            segmentEditorDialogOpen: false,
+            segmentEditorDialogValue: '',
+            segmentEditorDialogMode: ''
         }
     }
 
@@ -69,21 +74,105 @@ class AnimePage extends LogbookPage {
             this.setState({
                 columns: result['Columns'],
                 data: result['List'],
-                segments: Object.keys(result['List'])
+                segments: result['Segments']
             }, this.switchSegment)
         })
     }
 
     handleSegmentListClick = (value) => {
+        if (this.state.segmentIndex === value) {
+            this.setState({
+                segmentEditorDialogOpen: true,
+                segmentEditorDialogValue: this.state.segments[this.state.segmentIndex],
+                segmentEditorDialogMode: 'rename'
+            })
+        } else {
+            this.setState({
+                segmentIndex: value,
+                editMode: false
+            }, this.switchSegment)
+        }
+    }
+
+    handleAddSegmentClick = (value) => {
         this.setState({
-            segmentIndex: value,
-            editMode: false
-        }, this.switchSegment)
+            segmentEditorDialogOpen: true,
+            segmentEditorDialogValue: '',
+            segmentEditorDialogMode: 'add'
+        })
+    }
+
+    handleEditorDialogClose = (value) => {
+        this.setState({
+            segmentEditorDialogOpen: false
+        })
+        if (value !== null) {
+            switch (this.state.segmentEditorDialogMode) {
+                case 'rename': 
+                    this.renameSegment(value)
+                    break
+                case 'add':
+                    this.addSegment(value)
+                    break
+                default:
+        }}
+    }
+
+    handleEditorDialogDelete = () => {
+        this.setState({
+            segmentEditorDialogOpen: false
+        })
+        this.deleteSegment()
     }
 
     switchSegment () {
         this.setState({
-            list: this.state.data[this.state.segments[this.state.segmentIndex]]
+            list: this.state.data[this.state.segmentIndex]
+        })
+    }
+
+    renameSegment (value) {
+        this.setState({
+            segments: update(this.state.segments, {$splice: [[this.state.segmentIndex, 1, value]]})
+        })
+        const payload = {
+            segment: this.state.segmentIndex,
+            text: value
+        }
+        this.submitSegmentEdit('renameSegment', payload)
+    }
+
+    addSegment (value) {
+        this.setState({
+            segments: update(this.state.segments, {$unshift: [value]}),
+            data: update(this.state.data, {$unshift: [[]]}),
+            segmentIndex: 0
+        }, this.switchSegment)
+        const payload = {
+            text : value
+        }
+        this.submitSegmentEdit('addSegment', payload)
+    }
+
+    deleteSegment () {
+        this.setState({
+            segments: update(this.state.segments, {$splice: [[this.state.segmentIndex, 1]]}),
+            data: update(this.state.data, {$splice: [[this.segmentIndex, 1]]}),
+            segmentIndex: 0
+        }, this.switchSegment)
+        const payload = {
+            segment: this.state.segmentIndex
+        }
+        this.submitSegmentEdit('deleteSegment', payload)
+    }
+
+    submitSegmentEdit (action, payload) {
+        const body = {
+            'category' : this.state.categories[this.state.categoryIndex],
+            'payload' : payload
+        }
+        this.logbookFetch(action, body, (result) => {
+            this.updateStatusMessage(result)
         })
     }
 
@@ -231,7 +320,7 @@ class AnimePage extends LogbookPage {
         let lifelongSeries = 0
         let lifelongEpisodes = 0
         for (let i = 0; i < this.state.segments.length; i++) {
-            const listTotal = this.seasonListCounter(this.state.data[this.state.segments[i]])
+            const listTotal = this.seasonListCounter(this.state.data[i])
             if (this.state.segmentIndex === i) {
                 seasonSeries = listTotal[0]
                 seasonEpisodes = listTotal[1]
@@ -253,6 +342,11 @@ class AnimePage extends LogbookPage {
                 <br />
                 <Box sx = {styles.leftPanel}>
                     <List sx={styles.categoryList}>
+                        <ListItemButton
+                            onClick={this.handleAddSegmentClick}
+                        >
+                            New...
+                        </ListItemButton>
                         {this.state.segments.map( (segment, i) => 
                             <ListItemButton
                                 selected = {this.state.segmentIndex === i}
@@ -264,6 +358,13 @@ class AnimePage extends LogbookPage {
                         )}
                     </List>
                 </Box>
+                {this.state.segmentEditorDialogOpen ? <EditorDialog
+                    open = {true}
+                    value = {this.state.segmentEditorDialogValue}
+                    mode = {this.state.segmentEditorDialogMode}
+                    handleClose = {this.handleEditorDialogClose}
+                    handleDelete = {this.handleEditorDialogDelete}
+                /> : ''}
 
                 <Box sx={styles.rightPanel}>
                     {!this.state.editMode ? 
